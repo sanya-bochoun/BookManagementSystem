@@ -1,0 +1,58 @@
+@model IEnumerable<BookManagementSystem.Models.Book>
+@{
+    ViewData["Title"] = "Books List";
+    var categories = ViewBag.Categories as List<BookManagementSystem.Models.Category>;
+}
+<h2>Books List</h2>
+<form asp-action="Index" method="get" class="mb-3">
+    <div class="row">
+        <div class="col-md-4">
+            <input type="text" name="searchString" value="@Request.Query["searchString"]" class="form-control" placeholder="ค้นหาชื่อหนังสือหรือผู้แต่ง..." />
+        </div>
+        <div class="col-md-4">
+            <select name="categoryId" class="form-control">
+                <option value="">-- ทุกหมวดหมู่ --</option>
+                @if (categories != null)
+                {
+                    foreach (var cat in categories)
+                    {
+                        <option value="@cat.CategoryId" @(Request.Query["categoryId"] == cat.CategoryId.ToString() ? "selected" : "")>@cat.Name</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary">ค้นหา</button>
+            <a asp-action="Create" class="btn btn-success">เพิ่มหนังสือ</a>
+        </div>
+    </div>
+</form>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ชื่อหนังสือ</th>
+            <th>ผู้แต่ง</th>
+            <th>วันที่ตีพิมพ์</th>
+            <th>ISBN</th>
+            <th>หมวดหมู่</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Title</td>
+            <td>@item.Author</td>
+            <td>@item.PublishedDate.ToString("yyyy-MM-dd")</td>
+            <td>@item.ISBN</td>
+            <td>@item.Category?.Name</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.BookId" class="btn btn-info btn-sm">รายละเอียด</a>
+                <a asp-action="Edit" asp-route-id="@item.BookId" class="btn btn-warning btn-sm">แก้ไข</a>
+                <a asp-action="Delete" asp-route-id="@item.BookId" class="btn btn-danger btn-sm">ลบ</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table> 

@@ -1,0 +1,23 @@
+@model BookManagementSystem.Models.Book
+@{
+    ViewData["Title"] = "รายละเอียดหนังสือ";
+}
+<h2>@ViewData["Title"]</h2>
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">ชื่อหนังสือ</dt>
+            <dd class="col-sm-9">@Model.Title</dd>
+            <dt class="col-sm-3">ผู้แต่ง</dt>
+            <dd class="col-sm-9">@Model.Author</dd>
+            <dt class="col-sm-3">วันที่ตีพิมพ์</dt>
+            <dd class="col-sm-9">@Model.PublishedDate.ToString("yyyy-MM-dd")</dd>
+            <dt class="col-sm-3">ISBN</dt>
+            <dd class="col-sm-9">@Model.ISBN</dd>
+            <dt class="col-sm-3">หมวดหมู่</dt>
+            <dd class="col-sm-9">@Model.Category?.Name</dd>
+        </dl>
+        <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning">แก้ไข</a>
+        <a asp-action="Index" class="btn btn-secondary">กลับ</a>
+    </div>
+</div> 

@@ -1,0 +1,27 @@
+@model BookManagementSystem.Models.Book
+@{
+    ViewData["Title"] = "ลบหนังสือ";
+}
+<h2>@ViewData["Title"]</h2>
+<h4>คุณต้องการลบหนังสือเล่มนี้หรือไม่?</h4>
+<div class="card mb-3">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">ชื่อหนังสือ</dt>
+            <dd class="col-sm-9">@Model.Title</dd>
+            <dt class="col-sm-3">ผู้แต่ง</dt>
+            <dd class="col-sm-9">@Model.Author</dd>
+            <dt class="col-sm-3">วันที่ตีพิมพ์</dt>
+            <dd class="col-sm-9">@Model.PublishedDate.ToString("yyyy-MM-dd")</dd>
+            <dt class="col-sm-3">ISBN</dt>
+            <dd class="col-sm-9">@Model.ISBN</dd>
+            <dt class="col-sm-3">หมวดหมู่</dt>
+            <dd class="col-sm-9">@Model.Category?.Name</dd>
+        </dl>
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="BookId" />
+            <button type="submit" class="btn btn-danger">ยืนยันลบ</button>
+            <a asp-action="Index" class="btn btn-secondary">ยกเลิก</a>
+        </form>
+    </div>
+</div> 
