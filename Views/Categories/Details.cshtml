@@ -1,0 +1,29 @@
+@model BookManagementSystem.Models.Category
+@{
+    ViewData["Title"] = "รายละเอียดหมวดหมู่";
+}
+<h2>@ViewData["Title"]</h2>
+<div class="card mb-3">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">ชื่อหมวดหมู่</dt>
+            <dd class="col-sm-9">@Model.Name</dd>
+        </dl>
+        <h5>รายการหนังสือในหมวดหมู่นี้</h5>
+        @if (Model.Books != null && Model.Books.Any())
+        {
+            <ul>
+                @foreach (var book in Model.Books)
+                {
+                    <li>@book.Title (@book.Author)</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted">ไม่มีหนังสือในหมวดหมู่นี้</p>
+        }
+        <a asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn btn-warning">แก้ไข</a>
+        <a asp-action="Index" class="btn btn-secondary">กลับ</a>
+    </div>
+</div> 

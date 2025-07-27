@@ -1,0 +1,33 @@
+@model BookManagementSystem.Models.Category
+@{
+    ViewData["Title"] = "ลบหมวดหมู่";
+}
+<h2>@ViewData["Title"]</h2>
+<h4>คุณต้องการลบหมวดหมู่นี้หรือไม่?</h4>
+<div class="card mb-3">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">ชื่อหมวดหมู่</dt>
+            <dd class="col-sm-9">@Model.Name</dd>
+        </dl>
+        <h5>รายการหนังสือในหมวดหมู่นี้</h5>
+        @if (Model.Books != null && Model.Books.Any())
+        {
+            <ul>
+                @foreach (var book in Model.Books)
+                {
+                    <li>@book.Title (@book.Author)</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted">ไม่มีหนังสือในหมวดหมู่นี้</p>
+        }
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="CategoryId" />
+            <button type="submit" class="btn btn-danger">ยืนยันลบ</button>
+            <a asp-action="Index" class="btn btn-secondary">ยกเลิก</a>
+        </form>
+    </div>
+</div> 

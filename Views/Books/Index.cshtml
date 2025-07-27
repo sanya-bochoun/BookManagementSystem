@@ -7,7 +7,7 @@
 <form asp-action="Index" method="get" class="mb-3">
     <div class="row">
         <div class="col-md-4">
-            <input type="text" name="searchString" value="@Request.Query["searchString"]" class="form-control" placeholder="ค้นหาชื่อหนังสือหรือผู้แต่ง..." />
+            <input type="text" name="searchString" value="@(Context.Request.Query["searchString"])" class="form-control" placeholder="ค้นหาชื่อหนังสือหรือผู้แต่ง..." />
         </div>
         <div class="col-md-4">
             <select name="categoryId" class="form-control">
@@ -16,7 +16,7 @@
                 {
                     foreach (var cat in categories)
                     {
-                        <option value="@cat.CategoryId" @(Request.Query["categoryId"] == cat.CategoryId.ToString() ? "selected" : "")>@cat.Name</option>
+                        <option value="@cat.CategoryId" @(Context.Request.Query["categoryId"] == cat.CategoryId.ToString() ? "selected" : "")>@cat.Name</option>
                     }
                 }
             </select>

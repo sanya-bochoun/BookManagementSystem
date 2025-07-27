@@ -1,0 +1,17 @@
+@model BookManagementSystem.Models.Category
+@{
+    ViewData["Title"] = "เพิ่มหมวดหมู่";
+}
+<h2>@ViewData["Title"]</h2>
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">บันทึก</button>
+    <a asp-action="Index" class="btn btn-secondary">กลับ</a>
+</form>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 
