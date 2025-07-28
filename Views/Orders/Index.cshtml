@@ -1,0 +1,62 @@
+@model IEnumerable<BookManagementSystem.Models.Order>
+@{
+    ViewData["Title"] = "รายการคำสั่งซื้อ";
+}
+<div class="glass-card mt-4">
+    <h2 class="mb-4 text-white"><i class="fas fa-shopping-cart me-2"></i>รายการคำสั่งซื้อ</h2>
+    
+    <div class="mb-3">
+        <a asp-action="Create" class="btn btn-modern">
+            <i class="fas fa-plus me-1"></i>สร้างคำสั่งซื้อใหม่
+        </a>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped bg-white rounded shadow-sm">
+            <thead>
+                <tr>
+                    <th>รหัสคำสั่งซื้อ</th>
+                    <th>ลูกค้า</th>
+                    <th>วันที่สั่งซื้อ</th>
+                    <th>จำนวนรายการ</th>
+                    <th>ยอดรวม</th>
+                    <th style="width: 120px;">จัดการ</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>#@item.OrderId.ToString("D4")</td>
+                    <td>@item.Customer?.Name</td>
+                    <td>@item.OrderDate.ToString("dd/MM/yyyy")</td>
+                    <td>@item.OrderItems.Count รายการ</td>
+                    <td>@item.TotalAmount.ToString("N2") บาท</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a asp-action="Details" asp-route-id="@item.OrderId" class="btn btn-info btn-sm" title="ดูรายละเอียด">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@item.OrderId" class="btn btn-warning btn-sm" title="แก้ไข">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.OrderId" class="btn btn-danger btn-sm" title="ลบ">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">ไม่พบคำสั่งซื้อ</h4>
+            <p class="text-muted">เริ่มต้นโดยการสร้างคำสั่งซื้อใหม่</p>
+        </div>
+    }
+</div> 

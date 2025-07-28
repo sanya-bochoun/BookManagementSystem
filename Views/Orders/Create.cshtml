@@ -1,0 +1,193 @@
+@model BookManagementSystem.Models.Order
+@{
+    ViewData["Title"] = "สร้างคำสั่งซื้อใหม่";
+    var customers = ViewBag.Customers as List<BookManagementSystem.Models.Customer>;
+}
+
+<div class="glass-card mt-4">
+    <h2 class="mb-4 text-white"><i class="fas fa-plus me-2"></i>สร้างคำสั่งซื้อใหม่</h2>
+    
+    <form asp-action="Create" method="post" id="orderForm">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>ข้อมูลคำสั่งซื้อ</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="CustomerId" class="form-label">ลูกค้า</label>
+                            <select asp-for="CustomerId" class="form-control" required>
+                                <option value="">-- เลือกลูกค้า --</option>
+                                @if (customers != null)
+                                {
+                                    foreach (var customer in customers)
+                                    {
+                                        <option value="@customer.CustomerId">@customer.Name (@customer.Email)</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="CustomerId" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="OrderDate" class="form-label">วันที่สั่งซื้อ</label>
+                            <input asp-for="OrderDate" class="form-control" type="date" required />
+                            <span asp-validation-for="OrderDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>สรุปยอด</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="form-label">จำนวนรายการ:</label>
+                                <h4 id="itemCount">0</h4>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">ยอดรวม:</label>
+                                <h4 id="totalAmount" class="text-primary">0.00 บาท</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>รายการสินค้า</h5>
+                <button type="button" class="btn btn-success btn-sm" onclick="addOrderItem()">
+                    <i class="fas fa-plus me-1"></i>เพิ่มรายการ
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="orderItemsContainer">
+                    <!-- Order items will be added here dynamically -->
+                </div>
+            </div>
+        </div>
+        
+        <input type="hidden" id="orderItemsJson" name="orderItemsJson" />
+        
+        <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-modern" onclick="prepareOrderItems()">
+                <i class="fas fa-save me-1"></i>บันทึกคำสั่งซื้อ
+            </button>
+            <a asp-action="Index" class="btn btn-secondary-modern">
+                <i class="fas fa-arrow-left me-1"></i>กลับ
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+let orderItems = [];
+let itemCounter = 0;
+
+function addOrderItem() {
+    const container = document.getElementById('orderItemsContainer');
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'row mb-3 order-item';
+    itemDiv.id = `item-${itemCounter}`;
+    
+    itemDiv.innerHTML = `
+        <div class="col-md-4">
+            <label class="form-label">ชื่อสินค้า</label>
+            <input type="text" class="form-control product-name" placeholder="ชื่อสินค้า" required>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">จำนวน</label>
+            <input type="number" class="form-control quantity" min="1" value="1" required onchange="calculateSubTotal(${itemCounter})">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">ราคาต่อหน่วย</label>
+            <input type="number" class="form-control unit-price" min="0.01" step="0.01" value="0.00" required onchange="calculateSubTotal(${itemCounter})">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">ยอดรวม</label>
+            <input type="text" class="form-control sub-total" readonly value="0.00">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">&nbsp;</label>
+            <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeOrderItem(${itemCounter})">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `;
+    
+    container.appendChild(itemDiv);
+    itemCounter++;
+    updateSummary();
+}
+
+function removeOrderItem(itemId) {
+    const itemDiv = document.getElementById(`item-${itemId}`);
+    if (itemDiv) {
+        itemDiv.remove();
+        updateSummary();
+    }
+}
+
+function calculateSubTotal(itemId) {
+    const itemDiv = document.getElementById(`item-${itemId}`);
+    const quantity = parseFloat(itemDiv.querySelector('.quantity').value) || 0;
+    const unitPrice = parseFloat(itemDiv.querySelector('.unit-price').value) || 0;
+    const subTotal = quantity * unitPrice;
+    
+    itemDiv.querySelector('.sub-total').value = subTotal.toFixed(2);
+    updateSummary();
+}
+
+function updateSummary() {
+    const items = document.querySelectorAll('.order-item');
+    let totalAmount = 0;
+    
+    items.forEach(item => {
+        const subTotal = parseFloat(item.querySelector('.sub-total').value) || 0;
+        totalAmount += subTotal;
+    });
+    
+    document.getElementById('itemCount').textContent = items.length;
+    document.getElementById('totalAmount').textContent = totalAmount.toFixed(2) + ' บาท';
+}
+
+function prepareOrderItems() {
+    const items = [];
+    const orderItemElements = document.querySelectorAll('.order-item');
+    
+    orderItemElements.forEach(item => {
+        const productName = item.querySelector('.product-name').value;
+        const quantity = parseInt(item.querySelector('.quantity').value);
+        const unitPrice = parseFloat(item.querySelector('.unit-price').value);
+        
+        if (productName && quantity > 0 && unitPrice > 0) {
+            items.push({
+                ProductName: productName,
+                Quantity: quantity,
+                UnitPrice: unitPrice
+            });
+        }
+    });
+    
+    document.getElementById('orderItemsJson').value = JSON.stringify(items);
+}
+
+// Add initial item when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    addOrderItem();
+});
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 
