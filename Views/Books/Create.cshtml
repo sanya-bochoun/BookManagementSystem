@@ -1,47 +1,74 @@
 @model BookManagementSystem.Models.Book
 @{
     ViewData["Title"] = "เพิ่มหนังสือใหม่";
-    var categories = ViewBag.Categories as List<BookManagementSystem.Models.Category>;
+    var categories = ViewBag.Categories;
 }
-<h2>@ViewData["Title"]</h2>
-<form asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="Title"></label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Author"></label>
-        <input asp-for="Author" class="form-control" />
-        <span asp-validation-for="Author" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="PublishedDate"></label>
-        <input asp-for="PublishedDate" class="form-control" type="date" />
-        <span asp-validation-for="PublishedDate" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="ISBN"></label>
-        <input asp-for="ISBN" class="form-control" />
-        <span asp-validation-for="ISBN" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="CategoryId">หมวดหมู่</label>
-        <select asp-for="CategoryId" class="form-control">
-            <option value="">-- เลือกหมวดหมู่ --</option>
-            @if (categories != null)
-            {
-                foreach (var cat in categories)
+<div class="glass-card mt-4">
+    <h2 class="mb-4 text-white"><i class="fas fa-plus me-2"></i>เพิ่มหนังสือใหม่</h2>
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        @if (ViewBag.Errors != null && ViewBag.Errors.Count > 0)
+        {
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                @foreach (var err in ViewBag.Errors)
                 {
-                    <option value="@cat.CategoryId">@cat.Name</option>
+                    <li>@err</li>
                 }
-            }
-        </select>
-        <span asp-validation-for="CategoryId" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">บันทึก</button>
-    <a asp-action="Index" class="btn btn-secondary">กลับ</a>
-</form>
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-} 
+                </ul>
+            </div>
+        }
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label text-white"><i class="fas fa-book me-1"></i>ชื่อหนังสือ</label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Author" class="form-label text-white"><i class="fas fa-user-edit me-1"></i>ผู้แต่ง</label>
+            <input asp-for="Author" class="form-control" />
+            <span asp-validation-for="Author" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="PublishedDate" class="form-label text-white"><i class="fas fa-calendar-alt me-1"></i>วันที่ตีพิมพ์</label>
+            <input asp-for="PublishedDate" class="form-control" type="date" />
+            <span asp-validation-for="PublishedDate" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="ISBN" class="form-label text-white"><i class="fas fa-barcode me-1"></i>ISBN</label>
+            <input asp-for="ISBN" class="form-control" />
+            <span asp-validation-for="ISBN" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="CategoryId" class="form-label text-white"><i class="fas fa-tags me-1"></i>หมวดหมู่</label>
+            <select asp-for="CategoryId" class="form-control">
+                <option value="">-- เลือกหมวดหมู่ --</option>
+                @if (categories != null)
+                {
+                    foreach (var cat in categories)
+                    {
+                        <option value="@cat.CategoryId">@cat.Name</option>
+                    }
+                }
+            </select>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label text-white"><i class="fas fa-align-left me-1"></i>รายละเอียดหนังสือ</label>
+            <textarea asp-for="Description" class="form-control" rows="4" placeholder="อธิบายเนื้อหา สาระสำคัญ หรือรายละเอียดของหนังสือ..."></textarea>
+            <small class="text-white-50">อธิบายเนื้อหา สาระสำคัญ หรือรายละเอียดของหนังสือ (ไม่เกิน 2000 ตัวอักษร)</small>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label for="coverImage" class="form-label text-white"><i class="fas fa-image me-1"></i>รูปปกหนังสือ</label>
+            <input type="file" id="coverImage" name="coverImage" class="form-control" accept="image/*" />
+            <small class="text-white-50">รองรับไฟล์: JPG, PNG, GIF ขนาดไม่เกิน 5MB</small>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-modern"><i class="fas fa-save me-1"></i>บันทึก</button>
+            <a asp-action="Index" class="btn btn-secondary-modern"><i class="fas fa-arrow-left me-1"></i>กลับ</a>
+        </div>
+    </form>
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }
+</div> 

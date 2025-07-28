@@ -2,22 +2,69 @@
 @{
     ViewData["Title"] = "รายละเอียดหนังสือ";
 }
-<h2>@ViewData["Title"]</h2>
-<div class="card">
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">ชื่อหนังสือ</dt>
-            <dd class="col-sm-9">@Model.Title</dd>
-            <dt class="col-sm-3">ผู้แต่ง</dt>
-            <dd class="col-sm-9">@Model.Author</dd>
-            <dt class="col-sm-3">วันที่ตีพิมพ์</dt>
-            <dd class="col-sm-9">@Model.PublishedDate.ToString("yyyy-MM-dd")</dd>
-            <dt class="col-sm-3">ISBN</dt>
-            <dd class="col-sm-9">@Model.ISBN</dd>
-            <dt class="col-sm-3">หมวดหมู่</dt>
-            <dd class="col-sm-9">@Model.Category?.Name</dd>
-        </dl>
-        <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning">แก้ไข</a>
-        <a asp-action="Index" class="btn btn-secondary">กลับ</a>
+<div class="glass-card mt-4">
+    <h2 class="mb-4 text-white"><i class="fas fa-info-circle me-2"></i>รายละเอียดหนังสือ</h2>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+                    {
+                        <img src="@Model.CoverImageUrl" class="img-fluid rounded" alt="@Model.Title" style="max-height: 400px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-book fa-5x text-muted"></i>
+                            <p class="text-muted mt-3">ไม่มีรูปปก</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title text-primary mb-4">@Model.Title</h4>
+                    <dl class="row">
+                        <dt class="col-sm-4"><i class="fas fa-user-edit me-2"></i>ผู้แต่ง</dt>
+                        <dd class="col-sm-8">@Model.Author</dd>
+                        
+                        <dt class="col-sm-4"><i class="fas fa-calendar-alt me-2"></i>วันที่ตีพิมพ์</dt>
+                        <dd class="col-sm-8">@Model.PublishedDate.ToString("dd/MM/yyyy")</dd>
+                        
+                        <dt class="col-sm-4"><i class="fas fa-barcode me-2"></i>ISBN</dt>
+                        <dd class="col-sm-8">@Model.ISBN</dd>
+                        
+                        <dt class="col-sm-4"><i class="fas fa-tags me-2"></i>หมวดหมู่</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-primary">@Model.Category?.Name</span>
+                        </dd>
+                    </dl>
+                    
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <div class="mt-4">
+                            <h5 class="text-primary"><i class="fas fa-align-left me-2"></i>รายละเอียดหนังสือ</h5>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <p class="card-text" style="white-space: pre-line;">@Model.Description</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    
+                    <div class="mt-4">
+                        <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning me-2">
+                            <i class="fas fa-edit me-1"></i>แก้ไข
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>กลับ
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div> 

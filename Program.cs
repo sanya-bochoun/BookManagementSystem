@@ -1,4 +1,5 @@
 using BookManagementSystem.Models;
+using BookManagementSystem.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Register ApplicationDbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Register Cloudinary Service
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
 // เพิ่มบริการ MVC
 builder.Services.AddControllersWithViews();

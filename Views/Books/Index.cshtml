@@ -2,57 +2,126 @@
 @{
     ViewData["Title"] = "Books List";
     var categories = ViewBag.Categories as List<BookManagementSystem.Models.Category>;
+    var selectedCategoryId = Context.Request.Query["categoryId"].ToString();
 }
-<h2>Books List</h2>
-<form asp-action="Index" method="get" class="mb-3">
-    <div class="row">
+<div class="glass-card mt-4">
+    <h2 class="mb-4 text-white"><i class="fas fa-book me-2"></i>รายการหนังสือ</h2>
+    <form asp-action="Index" method="get" class="row g-3 align-items-end mb-4">
         <div class="col-md-4">
             <input type="text" name="searchString" value="@(Context.Request.Query["searchString"])" class="form-control" placeholder="ค้นหาชื่อหนังสือหรือผู้แต่ง..." />
         </div>
         <div class="col-md-4">
-            <select name="categoryId" class="form-control">
+            <select name="categoryId" id="categoryId" class="form-control">
                 <option value="">-- ทุกหมวดหมู่ --</option>
                 @if (categories != null)
                 {
                     foreach (var cat in categories)
                     {
-                        <option value="@cat.CategoryId" @(Context.Request.Query["categoryId"] == cat.CategoryId.ToString() ? "selected" : "")>@cat.Name</option>
+                        var isSelected = selectedCategoryId == cat.CategoryId.ToString() ? "selected" : "";
+                        @:<option value="@cat.CategoryId" @(isSelected)>@cat.Name</option>
                     }
                 }
             </select>
         </div>
-        <div class="col-md-4">
-            <button type="submit" class="btn btn-primary">ค้นหา</button>
-            <a asp-action="Create" class="btn btn-success">เพิ่มหนังสือ</a>
+        <div class="col-md-4 d-flex gap-2">
+            <button type="submit" class="btn btn-modern"><i class="fas fa-search me-1"></i>ค้นหา</button>
+            <a asp-action="Create" class="btn btn-secondary-modern"><i class="fas fa-plus me-1"></i>เพิ่มหนังสือ</a>
         </div>
+    </form>
+    
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped bg-white rounded shadow-sm">
+            <thead>
+                <tr>
+                    <th style="width: 80px;">รูปปก</th>
+                    <th>ชื่อหนังสือ</th>
+                    <th>ผู้แต่ง</th>
+                    <th>วันที่ตีพิมพ์</th>
+                    <th>ISBN</th>
+                    <th>หมวดหมู่</th>
+                    <th style="width: 120px;">จัดการ</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="text-center">
+                        @if (!string.IsNullOrEmpty(item.CoverImageUrl))
+                        {
+                            <img src="@item.CoverImageUrl" alt="@item.Title" class="book-cover-thumbnail" />
+                        }
+                        else
+                        {
+                            <div class="book-cover-placeholder">
+                                <i class="fas fa-book text-muted"></i>
+                            </div>
+                        }
+                    </td>
+                    <td>@item.Title</td>
+                    <td>@item.Author</td>
+                    <td>@item.PublishedDate.ToString("dd/MM/yyyy")</td>
+                    <td>@item.ISBN</td>
+                    <td>@item.Category?.Name</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a asp-action="Details" asp-route-id="@item.BookId" class="btn btn-info btn-sm" title="ดูรายละเอียด">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@item.BookId" class="btn btn-warning btn-sm" title="แก้ไข">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.BookId" class="btn btn-danger btn-sm" title="ลบ">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
     </div>
-</form>
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>ชื่อหนังสือ</th>
-            <th>ผู้แต่ง</th>
-            <th>วันที่ตีพิมพ์</th>
-            <th>ISBN</th>
-            <th>หมวดหมู่</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model)
+    
+    @if (!Model.Any())
     {
-        <tr>
-            <td>@item.Title</td>
-            <td>@item.Author</td>
-            <td>@item.PublishedDate.ToString("yyyy-MM-dd")</td>
-            <td>@item.ISBN</td>
-            <td>@item.Category?.Name</td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.BookId" class="btn btn-info btn-sm">รายละเอียด</a>
-                <a asp-action="Edit" asp-route-id="@item.BookId" class="btn btn-warning btn-sm">แก้ไข</a>
-                <a asp-action="Delete" asp-route-id="@item.BookId" class="btn btn-danger btn-sm">ลบ</a>
-            </td>
-        </tr>
+        <div class="text-center py-5">
+            <i class="fas fa-book fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">ไม่พบหนังสือ</h4>
+            <p class="text-muted">ลองเปลี่ยนคำค้นหาหรือหมวดหมู่</p>
+        </div>
     }
-    </tbody>
-</table> 
+</div>
+
+<style>
+.book-cover-thumbnail {
+    width: 50px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.book-cover-placeholder {
+    width: 50px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+}
+
+.btn-group .btn {
+    margin-left: 1px;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+.table td {
+    vertical-align: middle;
+}
+</style> 
