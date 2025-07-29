@@ -82,15 +82,23 @@ app.MapControllerRoute(
 // รัน database migration อัตโนมัติ
 try
 {
+    Console.WriteLine("Starting database migration...");
     using (var scope = app.Services.CreateScope())
     {
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        
+        // ตรวจสอบว่า database มีอยู่หรือไม่
+        Console.WriteLine($"Database exists: {context.Database.CanConnect()}");
+        
+        // รัน migration
         context.Database.Migrate();
+        Console.WriteLine("Database migration completed successfully!");
     }
 }
 catch (Exception ex)
 {
     Console.WriteLine($"Migration error: {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
     // Continue without migration for now
 }
 
