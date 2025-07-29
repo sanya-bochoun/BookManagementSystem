@@ -33,8 +33,11 @@ if (connectionString.StartsWith("postgresql://"))
     var username = userInfo[0];
     var password = userInfo[1];
     
-    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={username};Password={password}";
-    Console.WriteLine($"Converted Connection String: Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={username};Password=***");
+    // ใช้ port 5432 ถ้าไม่มี port ใน URL
+    var port = uri.Port > 0 ? uri.Port : 5432;
+    
+    connectionString = $"Host={uri.Host};Port={port};Database={uri.AbsolutePath.TrimStart('/')};Username={username};Password={password}";
+    Console.WriteLine($"Converted Connection String: Host={uri.Host};Port={port};Database={uri.AbsolutePath.TrimStart('/')};Username={username};Password=***");
 }
 
 if (connectionString.Contains("Server=") || connectionString.Contains("Data Source="))
