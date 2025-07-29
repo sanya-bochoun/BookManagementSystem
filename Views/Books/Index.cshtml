@@ -12,48 +12,44 @@
     <h2 class="mb-4 text-white"><i class="fas fa-book me-2"></i>รายการหนังสือ</h2>
     
     <!-- Search and Filter Form -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label">ค้นหาชื่อหนังสือหรือผู้แต่ง</label>
-                    <input type="text" name="searchString" class="form-control" value="@searchString" placeholder="ค้นหาชื่อหนังสือหรือผู้แต่ง..." />
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">หมวดหมู่</label>
-                    <select name="categoryId" class="form-control">
-                        <option value="">-- ทุกหมวดหมู่ --</option>
-                        @if (categories != null)
-                        {
-                            foreach (var item in categories)
-                            {
-                                if (categoryId.HasValue && categoryId.Value.ToString() == item.Value)
-                                {
-                                    <option value="@item.Value" selected>@item.Text</option>
-                                }
-                                else
-                                {
-                                    <option value="@item.Value">@item.Text</option>
-                                }
-                            }
-                        }
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">&nbsp;</label>
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-search me-1"></i>ค้นหา
-                    </button>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">&nbsp;</label>
-                    <a asp-action="Create" class="btn btn-success w-100">
-                        <i class="fas fa-plus me-1"></i>เพิ่มหนังสือ
-                    </a>
-                </div>
-            </form>
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label class="form-label">ค้นหาชื่อหนังสือหรือผู้แต่ง</label>
+            <input type="text" name="searchString" class="form-control" value="@searchString" placeholder="ค้นหาชื่อหนังสือหรือผู้แต่ง..." />
         </div>
-    </div>
+        <div class="col-md-3">
+            <label class="form-label">หมวดหมู่</label>
+            <select name="categoryId" class="form-control">
+                <option value="">-- ทุกหมวดหมู่ --</option>
+                @if (categories != null)
+                {
+                    foreach (var item in categories)
+                    {
+                        if (categoryId.HasValue && categoryId.Value.ToString() == item.Value)
+                        {
+                            <option value="@item.Value" selected>@item.Text</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">&nbsp;</label>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-search me-1"></i>ค้นหา
+            </button>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">&nbsp;</label>
+            <a asp-action="Create" class="btn btn-success w-100">
+                <i class="fas fa-plus me-1"></i>เพิ่มหนังสือ
+            </a>
+        </div>
+    </form>
     
     <!-- Results Summary -->
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -66,23 +62,23 @@
     </div>
     
     <div class="table-responsive">
-        <table class="table table-bordered table-striped bg-white rounded shadow-sm">
-            <thead>
-                <tr>
+    <table class="table table-bordered table-striped bg-white rounded shadow-sm">
+        <thead>
+            <tr>
                     <th style="width: 80px;">รูปปก</th>
-                    <th>ชื่อหนังสือ</th>
-                    <th>ผู้แต่ง</th>
-                    <th>วันที่ตีพิมพ์</th>
-                    <th>ISBN</th>
-                    <th>หมวดหมู่</th>
+                <th>ชื่อหนังสือ</th>
+                <th>ผู้แต่ง</th>
+                <th>วันที่ตีพิมพ์</th>
+                <th>ISBN</th>
+                <th>หมวดหมู่</th>
                     <th>ราคา</th>
                     <th style="width: 120px;">จัดการ</th>
-                </tr>
-            </thead>
-            <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
                     <td>
                         @if (!string.IsNullOrEmpty(item.CoverImageUrl))
                         {
@@ -95,11 +91,11 @@
                             </div>
                         }
                     </td>
-                    <td>@item.Title</td>
-                    <td>@item.Author</td>
+                <td>@item.Title</td>
+                <td>@item.Author</td>
                     <td>@item.PublishedDate.ToString("dd/MM/yyyy")</td>
-                    <td>@item.ISBN</td>
-                    <td>@item.Category?.Name</td>
+                <td>@item.ISBN</td>
+                <td>@item.Category?.Name</td>
                     <td>@item.Price.ToString("N2") บาท</td>
                     <td>
                         <div class="btn-group" role="group">
@@ -113,12 +109,12 @@
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    </div>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div> 
     
     <!-- Pagination -->
     @if (totalPages > 1)

@@ -275,25 +275,6 @@ body::before {
   box-shadow: none;
 }
 
-/* Search Form Styles */
-.card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: 15px;
-  box-shadow: var(--shadow-light);
-}
-
-.card-header {
-  background: rgba(255, 255, 255, 0.1);
-  border-bottom: 1px solid var(--glass-border);
-  border-radius: 15px 15px 0 0 !important;
-}
-
-.card-body {
-  padding: 1.5rem;
-}
-
 /* Results Summary */
 .text-white {
   color: white !important;
