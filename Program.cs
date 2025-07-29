@@ -74,15 +74,10 @@ app.UseStaticFiles();
 // ใช้งาน routing
 app.UseRouting();
 
-// ใช้งาน endpoints สำหรับ Controller + View
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-// รัน database migration อัตโนมัติ
+// สร้าง database และตารางอัตโนมัติ
 try
 {
-    Console.WriteLine("Starting database migration...");
+    Console.WriteLine("Starting database creation...");
     using (var scope = app.Services.CreateScope())
     {
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -90,16 +85,21 @@ try
         // ตรวจสอบว่า database มีอยู่หรือไม่
         Console.WriteLine($"Database exists: {context.Database.CanConnect()}");
         
-        // รัน migration
-        context.Database.Migrate();
-        Console.WriteLine("Database migration completed successfully!");
+        // สร้าง database และตารางทั้งหมด
+        context.Database.EnsureCreated();
+        Console.WriteLine("Database and tables created successfully!");
     }
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"Migration error: {ex.Message}");
+    Console.WriteLine($"Database creation error: {ex.Message}");
     Console.WriteLine($"Stack trace: {ex.StackTrace}");
-    // Continue without migration for now
+    // Continue without database creation for now
 }
+
+// ใช้งาน endpoints สำหรับ Controller + View
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
