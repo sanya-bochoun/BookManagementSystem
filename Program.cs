@@ -7,9 +7,34 @@ var builder = WebApplication.CreateBuilder(args);
 // Register ApplicationDbContext
 // รองรับทั้ง SQL Server และ PostgreSQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Debug: แสดง Connection String (ซ่อน password)
+if (!string.IsNullOrEmpty(connectionString))
+{
+    var debugConnectionString = connectionString.Replace("Mg9C6bfH0T8pkDcupTaEnocGm1siicrJ", "***");
+    Console.WriteLine($"Connection String: {debugConnectionString}");
+}
+else
+{
+    Console.WriteLine("Connection String is null or empty!");
+}
+
 if (string.IsNullOrEmpty(connectionString))
 {
     throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+}
+
+// ลองแปลง Connection String เป็น semicolon format
+if (connectionString.StartsWith("postgresql://"))
+{
+    // แปลงจาก URL format เป็น semicolon format
+    var uri = new Uri(connectionString);
+    var userInfo = uri.UserInfo.Split(':');
+    var username = userInfo[0];
+    var password = userInfo[1];
+    
+    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={username};Password={password}";
+    Console.WriteLine($"Converted Connection String: Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={username};Password=***");
 }
 
 if (connectionString.Contains("Server=") || connectionString.Contains("Data Source="))
