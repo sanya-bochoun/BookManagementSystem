@@ -1,6 +1,6 @@
+global using Microsoft.EntityFrameworkCore;
 using BookManagementSystem.Models;
 using BookManagementSystem.Services;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
