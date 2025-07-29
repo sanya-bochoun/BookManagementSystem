@@ -11,7 +11,7 @@ namespace BookManagementSystem.Models
         [Required(ErrorMessage = "กรุณาเลือกลูกค้า")]
         [ForeignKey("Customer")]
         public int CustomerId { get; set; }
-        public Customer Customer { get; set; } = null!;
+        public Customer? Customer { get; set; }
 
         [Required(ErrorMessage = "กรุณาเลือกวันที่สั่งซื้อ")]
         [DataType(DataType.Date)]

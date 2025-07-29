@@ -1,28 +1,16 @@
 @model BookManagementSystem.Models.Order
 @{
-    ViewData["Title"] = "สร้างคำสั่งซื้อใหม่";
+    ViewData["Title"] = "แก้ไขคำสั่งซื้อ";
     var customers = ViewBag.Customers as List<BookManagementSystem.Models.Customer>;
 }
 
 <div class="glass-card mt-4">
-    <h2 class="mb-4 text-white"><i class="fas fa-plus me-2"></i>สร้างคำสั่งซื้อใหม่</h2>
+    <h2 class="mb-4 text-white"><i class="fas fa-edit me-2"></i>แก้ไขคำสั่งซื้อ</h2>
     
-    <form asp-action="Create" method="post" id="orderForm">
+    <form asp-action="Edit" method="post" id="orderForm">
         @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="OrderId" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        
-        @if (!ViewData.ModelState.IsValid)
-        {
-            <div class="alert alert-danger">
-                <h6><i class="fas fa-exclamation-triangle me-2"></i>เกิดข้อผิดพลาด</h6>
-                <ul class="mb-0">
-                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                    {
-                        <li>@error.ErrorMessage</li>
-                    }
-                </ul>
-            </div>
-        }
         
         <div class="row">
             <div class="col-md-6">
@@ -39,7 +27,18 @@
                                 {
                                     foreach (var customer in customers)
                                     {
-                                        <option value="@customer.CustomerId">@customer.Name (@customer.Email)</option>
+                                        if (customer.CustomerId == Model.CustomerId)
+                                        {
+                                            <option value="@customer.CustomerId" selected>
+                                                @customer.Name (@customer.Email)
+                                            </option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@customer.CustomerId">
+                                                @customer.Name (@customer.Email)
+                                            </option>
+                                        }
                                     }
                                 }
                             </select>
@@ -93,8 +92,8 @@
         <input type="hidden" id="orderItemsJson" name="orderItemsJson" />
         
         <div class="d-flex gap-2 mt-3">
-            <button type="submit" class="btn btn-modern">
-                <i class="fas fa-save me-1"></i>บันทึกคำสั่งซื้อ
+            <button type="submit" class="btn btn-modern" onclick="prepareOrderItems()">
+                <i class="fas fa-save me-1"></i>บันทึกการแก้ไข
             </button>
             <a asp-action="Index" class="btn btn-secondary-modern">
                 <i class="fas fa-arrow-left me-1"></i>กลับ
@@ -107,7 +106,26 @@
 let orderItems = [];
 let itemCounter = 0;
 
-function addOrderItem() {
+// Load existing order items
+document.addEventListener('DOMContentLoaded', function() {
+    @if (Model.OrderItems.Any())
+    {
+        @foreach (var item in Model.OrderItems)
+        {
+            <text>
+            addOrderItem('@item.ProductName', @item.Quantity, @item.UnitPrice);
+            </text>
+        }
+    }
+    else
+    {
+        <text>
+        addOrderItem();
+        </text>
+    }
+});
+
+function addOrderItem(productName = '', quantity = 1, unitPrice = 0) {
     const container = document.getElementById('orderItemsContainer');
     const itemDiv = document.createElement('div');
     itemDiv.className = 'row mb-3 order-item';
@@ -116,19 +134,19 @@ function addOrderItem() {
     itemDiv.innerHTML = `
         <div class="col-md-4">
             <label class="form-label">ชื่อสินค้า</label>
-            <input type="text" class="form-control product-name" placeholder="ชื่อสินค้า" required>
+            <input type="text" class="form-control product-name" placeholder="ชื่อสินค้า" value="${productName}" required>
         </div>
         <div class="col-md-2">
             <label class="form-label">จำนวน</label>
-            <input type="number" class="form-control quantity" min="1" value="1" required onchange="calculateSubTotal(${itemCounter})">
+            <input type="number" class="form-control quantity" min="1" value="${quantity}" required onchange="calculateSubTotal(${itemCounter})">
         </div>
         <div class="col-md-2">
             <label class="form-label">ราคาต่อหน่วย</label>
-            <input type="number" class="form-control unit-price" min="0.01" step="0.01" value="0.00" required onchange="calculateSubTotal(${itemCounter})">
+            <input type="number" class="form-control unit-price" min="0.01" step="0.01" value="${unitPrice}" required onchange="calculateSubTotal(${itemCounter})">
         </div>
         <div class="col-md-2">
             <label class="form-label">ยอดรวม</label>
-            <input type="text" class="form-control sub-total" readonly value="0.00">
+            <input type="text" class="form-control sub-total" readonly value="${(quantity * unitPrice).toFixed(2)}">
         </div>
         <div class="col-md-2">
             <label class="form-label">&nbsp;</label>
@@ -178,15 +196,10 @@ function prepareOrderItems() {
     const items = [];
     const orderItemElements = document.querySelectorAll('.order-item');
     
-    console.log('Preparing order items...');
-    console.log('Found order items:', orderItemElements.length);
-    
-    orderItemElements.forEach((item, index) => {
+    orderItemElements.forEach(item => {
         const productName = item.querySelector('.product-name').value;
         const quantity = parseInt(item.querySelector('.quantity').value);
         const unitPrice = parseFloat(item.querySelector('.unit-price').value);
-        
-        console.log(`Item ${index + 1}:`, { productName, quantity, unitPrice });
         
         if (productName && quantity > 0 && unitPrice > 0) {
             items.push({
@@ -194,53 +207,11 @@ function prepareOrderItems() {
                 Quantity: quantity,
                 UnitPrice: unitPrice
             });
-        } else {
-            console.log(`Item ${index + 1} skipped - invalid data`);
         }
     });
     
-    const jsonData = JSON.stringify(items);
-    console.log('JSON Data:', jsonData);
-    
-    document.getElementById('orderItemsJson').value = jsonData;
-    
-    // Validate form before submit
-    const form = document.getElementById('orderForm');
-    const customerId = form.querySelector('select[name="CustomerId"]').value;
-    const orderDate = form.querySelector('input[name="OrderDate"]').value;
-    
-    console.log('Form validation:', { customerId, orderDate, itemsCount: items.length });
-    
-    if (!customerId) {
-        alert('กรุณาเลือกลูกค้า');
-        return false;
-    }
-    
-    if (!orderDate) {
-        alert('กรุณาเลือกวันที่สั่งซื้อ');
-        return false;
-    }
-    
-    if (items.length === 0) {
-        alert('กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ');
-        return false;
-    }
-    
-    return true;
+    document.getElementById('orderItemsJson').value = JSON.stringify(items);
 }
-
-// Add form submit handler
-document.addEventListener('DOMContentLoaded', function() {
-    addOrderItem();
-    
-    const form = document.getElementById('orderForm');
-    form.addEventListener('submit', function(e) {
-        if (!prepareOrderItems()) {
-            e.preventDefault();
-            return false;
-        }
-    });
-});
 </script>
 
 @section Scripts {

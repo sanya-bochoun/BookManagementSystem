@@ -1,7 +1,6 @@
 @model BookManagementSystem.Models.Book
 @{
     ViewData["Title"] = "แก้ไขข้อมูลหนังสือ";
-    var categories = ViewBag.Categories as List<BookManagementSystem.Models.Category>;
 }
 <div class="glass-card mt-4">
     <h2 class="mb-4 text-white"><i class="fas fa-edit me-2"></i>แก้ไขข้อมูลหนังสือ</h2>
@@ -33,23 +32,22 @@
                 </div>
                 <div class="mb-3">
                     <label asp-for="CategoryId" class="form-label text-white"><i class="fas fa-tags me-1"></i>หมวดหมู่</label>
-                    <select name="CategoryId" id="CategoryId" class="form-control">
+                    <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
                         <option value="">-- เลือกหมวดหมู่ --</option>
-                        @if (categories != null)
-                        {
-                            foreach (var cat in categories)
-                            {
-                                var isSelected = Model.CategoryId == cat.CategoryId ? "selected" : "";
-                                @:<option value="@cat.CategoryId" @(isSelected)>@cat.Name</option>
-                            }
-                        }
                     </select>
                     <span asp-validation-for="CategoryId" class="text-danger"></span>
                 </div>
+                
+                <div class="mb-3">
+                    <label asp-for="Price" class="form-label text-white"><i class="fas fa-money-bill me-1"></i>ราคา</label>
+                    <input asp-for="Price" class="form-control" type="number" min="0.01" step="0.01" placeholder="0.00" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+                
                 <div class="mb-3">
                     <label asp-for="Description" class="form-label text-white"><i class="fas fa-align-left me-1"></i>รายละเอียดหนังสือ</label>
                     <textarea asp-for="Description" class="form-control" rows="4" placeholder="อธิบายเนื้อหา สาระสำคัญ หรือรายละเอียดของหนังสือ..."></textarea>
-                    <small class="text-white-50">อธิบายเนื้อหา สาระสำคัญ หรือรายละเอียดของหนังสือ (ไม่เกิน 2000 ตัวอักษร)</small>
+                    <small class="text-muted">(ไม่เกิน 2000 ตัวอักษร)</small>
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
                 <div class="mb-3">

@@ -25,6 +25,6 @@ app.UseRouting();
 // ใช้งาน endpoints สำหรับ Controller + View
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Books}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

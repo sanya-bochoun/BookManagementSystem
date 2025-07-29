@@ -1,33 +1,69 @@
 @model IEnumerable<BookManagementSystem.Models.Book>
 @{
-    ViewData["Title"] = "Books List";
-    var categories = ViewBag.Categories as List<BookManagementSystem.Models.Category>;
-    var selectedCategoryId = Context.Request.Query["categoryId"].ToString();
+    ViewData["Title"] = "รายการหนังสือ";
+    var searchString = ViewBag.SearchString as string;
+    var categoryId = ViewBag.CategoryId as int?;
+    var currentPage = ViewBag.CurrentPage as int? ?? 1;
+    var totalPages = ViewBag.TotalPages as int? ?? 1;
+    var totalBooks = ViewBag.TotalBooks as int? ?? 0;
+    var categories = ViewBag.Categories as SelectList;
 }
 <div class="glass-card mt-4">
     <h2 class="mb-4 text-white"><i class="fas fa-book me-2"></i>รายการหนังสือ</h2>
-    <form asp-action="Index" method="get" class="row g-3 align-items-end mb-4">
-        <div class="col-md-4">
-            <input type="text" name="searchString" value="@(Context.Request.Query["searchString"])" class="form-control" placeholder="ค้นหาชื่อหนังสือหรือผู้แต่ง..." />
+    
+    <!-- Search and Filter Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">ค้นหาชื่อหนังสือหรือผู้แต่ง</label>
+                    <input type="text" name="searchString" class="form-control" value="@searchString" placeholder="ค้นหาชื่อหนังสือหรือผู้แต่ง..." />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">หมวดหมู่</label>
+                    <select name="categoryId" class="form-control">
+                        <option value="">-- ทุกหมวดหมู่ --</option>
+                        @if (categories != null)
+                        {
+                            foreach (var item in categories)
+                            {
+                                if (categoryId.HasValue && categoryId.Value.ToString() == item.Value)
+                                {
+                                    <option value="@item.Value" selected>@item.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i>ค้นหา
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <a asp-action="Create" class="btn btn-success w-100">
+                        <i class="fas fa-plus me-1"></i>เพิ่มหนังสือ
+                    </a>
+                </div>
+            </form>
         </div>
-        <div class="col-md-4">
-            <select name="categoryId" id="categoryId" class="form-control">
-                <option value="">-- ทุกหมวดหมู่ --</option>
-                @if (categories != null)
-                {
-                    foreach (var cat in categories)
-                    {
-                        var isSelected = selectedCategoryId == cat.CategoryId.ToString() ? "selected" : "";
-                        @:<option value="@cat.CategoryId" @(isSelected)>@cat.Name</option>
-                    }
-                }
-            </select>
+    </div>
+    
+    <!-- Results Summary -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <span class="text-white">แสดงผล @Model.Count() รายการ จากทั้งหมด @totalBooks รายการ</span>
         </div>
-        <div class="col-md-4 d-flex gap-2">
-            <button type="submit" class="btn btn-modern"><i class="fas fa-search me-1"></i>ค้นหา</button>
-            <a asp-action="Create" class="btn btn-secondary-modern"><i class="fas fa-plus me-1"></i>เพิ่มหนังสือ</a>
+        <div>
+            <span class="text-white">หน้า @currentPage จาก @totalPages</span>
         </div>
-    </form>
+    </div>
     
     <div class="table-responsive">
         <table class="table table-bordered table-striped bg-white rounded shadow-sm">
@@ -39,6 +75,7 @@
                     <th>วันที่ตีพิมพ์</th>
                     <th>ISBN</th>
                     <th>หมวดหมู่</th>
+                    <th>ราคา</th>
                     <th style="width: 120px;">จัดการ</th>
                 </tr>
             </thead>
@@ -46,7 +83,7 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td class="text-center">
+                    <td>
                         @if (!string.IsNullOrEmpty(item.CoverImageUrl))
                         {
                             <img src="@item.CoverImageUrl" alt="@item.Title" class="book-cover-thumbnail" />
@@ -54,7 +91,7 @@
                         else
                         {
                             <div class="book-cover-placeholder">
-                                <i class="fas fa-book text-muted"></i>
+                                <i class="fas fa-book"></i>
                             </div>
                         }
                     </td>
@@ -63,6 +100,7 @@
                     <td>@item.PublishedDate.ToString("dd/MM/yyyy")</td>
                     <td>@item.ISBN</td>
                     <td>@item.Category?.Name</td>
+                    <td>@item.Price.ToString("N2") บาท</td>
                     <td>
                         <div class="btn-group" role="group">
                             <a asp-action="Details" asp-route-id="@item.BookId" class="btn btn-info btn-sm" title="ดูรายละเอียด">
@@ -81,6 +119,94 @@
             </tbody>
         </table>
     </div>
+    
+    <!-- Pagination -->
+    @if (totalPages > 1)
+    {
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <!-- Previous Page -->
+                @if (currentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { searchString = searchString, categoryId = categoryId, page = currentPage - 1 })">
+                            <i class="fas fa-chevron-left"></i> ก่อนหน้า
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-chevron-left"></i> ก่อนหน้า</span>
+                    </li>
+                }
+                
+                <!-- Page Numbers -->
+                @{
+                    int startPage = Math.Max(1, currentPage - 2);
+                    int endPage = Math.Min(totalPages, currentPage + 2);
+                }
+                
+                @if (startPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { searchString = searchString, categoryId = categoryId, page = 1 })">1</a>
+                    </li>
+                    @if (startPage > 2)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+                }
+                
+                @for (int i = startPage; i <= endPage; i++)
+                {
+                    if (i == currentPage)
+                    {
+                        <li class="page-item active">
+                            <span class="page-link">@i</span>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("Index", new { searchString = searchString, categoryId = categoryId, page = i })">@i</a>
+                        </li>
+                    }
+                }
+                
+                @if (endPage < totalPages)
+                {
+                    @if (endPage < totalPages - 1)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { searchString = searchString, categoryId = categoryId, page = totalPages })">@totalPages</a>
+                    </li>
+                }
+                
+                <!-- Next Page -->
+                @if (currentPage < totalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { searchString = searchString, categoryId = categoryId, page = currentPage + 1 })">
+                            ถัดไป <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">ถัดไป <i class="fas fa-chevron-right"></i></span>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
     
     @if (!Model.Any())
     {

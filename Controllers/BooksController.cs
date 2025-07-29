@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BookManagementSystem.Models;
 using BookManagementSystem.Services;
@@ -22,21 +23,42 @@ namespace BookManagementSystem.Controllers
         }
 
         // GET: Books
-        public async Task<IActionResult> Index(string searchString, int? categoryId)
+        public async Task<IActionResult> Index(string searchString, int? categoryId, int page = 1)
         {
-            var books = _context.Books.Include(b => b.Category).AsQueryable();
-
+            var booksQuery = _context.Books.Include(b => b.Category).AsQueryable();
+            
+            // Apply search filter
             if (!string.IsNullOrEmpty(searchString))
             {
-                books = books.Where(b => b.Title.Contains(searchString) || b.Author.Contains(searchString));
+                booksQuery = booksQuery.Where(b => b.Title.Contains(searchString) || b.Author.Contains(searchString));
             }
+            
+            // Apply category filter
             if (categoryId.HasValue)
             {
-                books = books.Where(b => b.CategoryId == categoryId);
+                booksQuery = booksQuery.Where(b => b.CategoryId == categoryId.Value);
             }
-
-            ViewBag.Categories = await _context.Categories.ToListAsync();
-            return View(await books.ToListAsync());
+            
+            // Pagination
+            int pageSize = 8;
+            int totalBooks = await booksQuery.CountAsync();
+            int totalPages = (int)Math.Ceiling((double)totalBooks / pageSize);
+            
+            var books = await booksQuery
+                .OrderByDescending(b => b.PublishedDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+            
+            // Prepare view data
+            ViewBag.SearchString = searchString;
+            ViewBag.CategoryId = categoryId;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalBooks = totalBooks;
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
+            
+            return View(books);
         }
 
         // GET: Books/Details/5
@@ -50,48 +72,29 @@ namespace BookManagementSystem.Controllers
         }
 
         // GET: Books/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewBag.Categories = _context.Categories.ToList();
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
             return View();
         }
 
         // POST: Books/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Title,Author,PublishedDate,ISBN,CategoryId,Description")] Book book, IFormFile? coverImage)
+        public async Task<IActionResult> Create([Bind("Title,Author,PublishedDate,ISBN,CategoryId,Price,Description")] Book book, IFormFile? coverImage)
         {
-            try
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
+                if (coverImage != null)
                 {
-                    // Upload cover image if provided
-                    if (coverImage != null && coverImage.Length > 0)
-                    {
-                        book.CoverImageUrl = await _cloudinaryService.UploadImageAsync(coverImage);
-                    }
+                    book.CoverImageUrl = await _cloudinaryService.UploadImageAsync(coverImage);
+                }
 
-                    _context.Add(book);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    // Log validation errors
-                    var errors = ModelState.Values
-                        .SelectMany(v => v.Errors)
-                        .Select(e => e.ErrorMessage)
-                        .ToList();
-                    ViewBag.Errors = errors;
-                }
+                _context.Add(book);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
-            {
-                // Log the exception
-                ViewBag.Errors = new List<string> { "เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + ex.Message };
-            }
-            
-            ViewBag.Categories = _context.Categories.ToList();
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
             return View(book);
         }
 
@@ -99,29 +102,31 @@ namespace BookManagementSystem.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
+            
             var book = await _context.Books.FindAsync(id);
             if (book == null) return NotFound();
-            ViewBag.Categories = _context.Categories.ToList();
+            
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
             return View(book);
         }
 
         // POST: Books/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BookId,Title,Author,PublishedDate,ISBN,CategoryId,CoverImageUrl,Description")] Book book, IFormFile? coverImage)
+        public async Task<IActionResult> Edit(int id, [Bind("BookId,Title,Author,PublishedDate,ISBN,CategoryId,Price,CoverImageUrl,Description")] Book book, IFormFile? coverImage)
         {
             if (id != book.BookId) return NotFound();
+            
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // Upload new cover image if provided
-                    if (coverImage != null && coverImage.Length > 0)
+                    // Handle cover image update
+                    if (coverImage != null)
                     {
                         // Delete old image if exists
                         if (!string.IsNullOrEmpty(book.CoverImageUrl))
                         {
-                            // Extract public ID from URL and delete
                             var publicId = ExtractPublicIdFromUrl(book.CoverImageUrl);
                             if (!string.IsNullOrEmpty(publicId))
                             {
@@ -129,6 +134,7 @@ namespace BookManagementSystem.Controllers
                             }
                         }
                         
+                        // Upload new image
                         book.CoverImageUrl = await _cloudinaryService.UploadImageAsync(coverImage);
                     }
 
@@ -144,7 +150,7 @@ namespace BookManagementSystem.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewBag.Categories = _context.Categories.ToList();
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
             return View(book);
         }
 

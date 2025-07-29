@@ -34,12 +34,15 @@
                         <dt class="col-sm-4"><i class="fas fa-calendar-alt me-2"></i>วันที่ตีพิมพ์</dt>
                         <dd class="col-sm-8">@Model.PublishedDate.ToString("dd/MM/yyyy")</dd>
                         
-                        <dt class="col-sm-4"><i class="fas fa-barcode me-2"></i>ISBN</dt>
+                        <dt class="col-sm-4">ISBN:</dt>
                         <dd class="col-sm-8">@Model.ISBN</dd>
                         
-                        <dt class="col-sm-4"><i class="fas fa-tags me-2"></i>หมวดหมู่</dt>
+                        <dt class="col-sm-4">หมวดหมู่:</dt>
+                        <dd class="col-sm-8">@Model.Category?.Name</dd>
+                        
+                        <dt class="col-sm-4">ราคา:</dt>
                         <dd class="col-sm-8">
-                            <span class="badge bg-primary">@Model.Category?.Name</span>
+                            <span class="badge bg-success fs-6">@Model.Price.ToString("N2") บาท</span>
                         </dd>
                     </dl>
                     

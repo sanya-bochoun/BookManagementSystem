@@ -1,0 +1,188 @@
+@model BookManagementSystem.Controllers.DashboardViewModel
+@{
+    ViewData["Title"] = "แดชบอร์ด";
+}
+<div class="glass-card mt-4">
+    <h2 class="mb-4 text-white"><i class="fas fa-chart-line me-2"></i>แดชบอร์ด</h2>
+    
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>@Model.TotalBooks</h4>
+                            <p class="mb-0">หนังสือ</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-book fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>@Model.TotalCustomers</h4>
+                            <p class="mb-0">ลูกค้า</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>@Model.TotalOrders</h4>
+                            <p class="mb-0">คำสั่งซื้อ</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-shopping-cart fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>@Model.TotalRevenue.ToString("N2")</h4>
+                            <p class="mb-0">ยอดรวม (บาท)</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-money-bill-wave fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Recent Orders -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>คำสั่งซื้อล่าสุด</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentOrders.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>รหัส</th>
+                                        <th>ลูกค้า</th>
+                                        <th>วันที่</th>
+                                        <th>ยอดรวม</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model.RecentOrders)
+                                    {
+                                        <tr>
+                                            <td>#@order.OrderId.ToString("D4")</td>
+                                            <td>@order.Customer?.Name</td>
+                                            <td>@order.OrderDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@order.TotalAmount.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">ไม่มีคำสั่งซื้อล่าสุด</p>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Books -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-star me-2"></i>หนังสือล่าสุด</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.TopBooks.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>ชื่อหนังสือ</th>
+                                        <th>หมวดหมู่</th>
+                                        <th>วันที่ตีพิมพ์</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var book in Model.TopBooks)
+                                    {
+                                        <tr>
+                                            <td>@book.Title</td>
+                                            <td>@book.Category?.Name</td>
+                                            <td>@book.PublishedDate.ToString("dd/MM/yyyy")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">ไม่มีหนังสือในระบบ</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>การดำเนินการด่วน</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="/Books/Create" class="btn btn-primary w-100 mb-2">
+                                <i class="fas fa-plus me-2"></i>เพิ่มหนังสือ
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="/Customers/Create" class="btn btn-success w-100 mb-2">
+                                <i class="fas fa-user-plus me-2"></i>เพิ่มลูกค้า
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="/Orders/Create" class="btn btn-warning w-100 mb-2">
+                                <i class="fas fa-shopping-cart me-2"></i>สร้างคำสั่งซื้อ
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="/Categories/Create" class="btn btn-info w-100 mb-2">
+                                <i class="fas fa-tag me-2"></i>เพิ่มหมวดหมู่
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

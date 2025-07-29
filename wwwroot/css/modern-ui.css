@@ -235,3 +235,67 @@ body::before {
     align-items: center;
   }
 }
+
+/* Pagination Styles */
+.pagination {
+  gap: 0.25rem;
+}
+
+.pagination .page-item .page-link {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: white;
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.pagination .page-item .page-link:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.pagination .page-item.active .page-link {
+  background: var(--accent-gradient);
+  border-color: transparent;
+  box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+}
+
+.pagination .page-item.disabled .page-link {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+}
+
+.pagination .page-item.disabled .page-link:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Search Form Styles */
+.card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 15px;
+  box-shadow: var(--shadow-light);
+}
+
+.card-header {
+  background: rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--glass-border);
+  border-radius: 15px 15px 0 0 !important;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Results Summary */
+.text-white {
+  color: white !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}

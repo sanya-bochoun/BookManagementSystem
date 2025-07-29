@@ -53,19 +53,48 @@ namespace BookManagementSystem.Controllers
         {
             try
             {
+                // Debug logging
+                Console.WriteLine($"CustomerId: {order.CustomerId}");
+                Console.WriteLine($"OrderDate: {order.OrderDate}");
+                Console.WriteLine($"OrderItemsJson: {orderItemsJson}");
+                
+                // Manual validation for CustomerId
+                if (order.CustomerId <= 0)
+                {
+                    ModelState.AddModelError("CustomerId", "กรุณาเลือกลูกค้า");
+                }
+                
                 if (ModelState.IsValid)
                 {
                     // Deserialize OrderItems from JSON
-                    var orderItems = JsonSerializer.Deserialize<List<OrderItem>>(orderItemsJson ?? "[]");
+                    List<OrderItem> orderItems = new List<OrderItem>();
+                    
+                    if (!string.IsNullOrEmpty(orderItemsJson))
+                    {
+                        try
+                        {
+                            orderItems = JsonSerializer.Deserialize<List<OrderItem>>(orderItemsJson) ?? new List<OrderItem>();
+                        }
+                        catch (JsonException ex)
+                        {
+                            Console.WriteLine($"JSON Deserialize Error: {ex.Message}");
+                            ModelState.AddModelError("", "ข้อมูลรายการสินค้าไม่ถูกต้อง");
+                            ViewBag.Customers = await _context.Customers.ToListAsync();
+                            return View(order);
+                        }
+                    }
                     
                     // Calculate total amount
-                    order.TotalAmount = orderItems?.Sum(oi => oi.SubTotal) ?? 0;
+                    order.TotalAmount = orderItems.Sum(oi => oi.SubTotal);
+                    
+                    Console.WriteLine($"TotalAmount: {order.TotalAmount}");
+                    Console.WriteLine($"OrderItems Count: {orderItems.Count}");
                     
                     _context.Add(order);
                     await _context.SaveChangesAsync();
                     
                     // Add OrderItems
-                    if (orderItems != null)
+                    if (orderItems.Any())
                     {
                         foreach (var item in orderItems)
                         {
@@ -77,9 +106,19 @@ namespace BookManagementSystem.Controllers
                     
                     return RedirectToAction(nameof(Index));
                 }
+                else
+                {
+                    Console.WriteLine("ModelState is not valid:");
+                    foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        Console.WriteLine($"Error: {error.ErrorMessage}");
+                    }
+                }
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Exception: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
                 ModelState.AddModelError("", "เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + ex.Message);
             }
             
