@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: book-management-system
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerCommand: dotnet BookManagementSystem.dll
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: book-management-db
+          property: connectionString
+      - key: Cloudinary__CloudName
+        value: ddlnfwevx
+      - key: Cloudinary__ApiKey
+        value: 735976651797734
+      - key: Cloudinary__ApiSecret
+        value: v5bBR1OO5hlktSoBW0bCusP6SeE
+
+databases:
+  - name: book-management-db
+    plan: free
+    databaseName: bookmanagementdb
+    user: bookmanagementuser 
