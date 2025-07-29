@@ -7,6 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Register ApplicationDbContext
 // รองรับทั้ง SQL Server และ PostgreSQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+}
+
 if (connectionString.Contains("Server=") || connectionString.Contains("Data Source="))
 {
     // SQL Server
@@ -47,10 +52,18 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 // รัน database migration อัตโนมัติ
-using (var scope = app.Services.CreateScope())
+try
 {
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    context.Database.Migrate();
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate();
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Migration error: {ex.Message}");
+    // Continue without migration for now
 }
 
 app.Run();
