@@ -17,11 +17,16 @@ if (!string.IsNullOrEmpty(connectionString))
 else
 {
     Console.WriteLine("Connection String is null or empty!");
+    Console.WriteLine("Available configuration keys:");
+    foreach (var key in builder.Configuration.AsEnumerable())
+    {
+        Console.WriteLine($"  {key.Key}: {key.Value}");
+    }
 }
 
 if (string.IsNullOrEmpty(connectionString))
 {
-    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+    throw new InvalidOperationException("Connection string 'DefaultConnection' not found. Please check your environment variables or configuration.");
 }
 
 // ลองแปลง Connection String เป็น semicolon format
@@ -88,15 +93,28 @@ try
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         
         // ตรวจสอบว่า database มีอยู่หรือไม่
-        Console.WriteLine($"Database exists: {context.Database.CanConnect()}");
+        var canConnect = context.Database.CanConnect();
+        Console.WriteLine($"Database can connect: {canConnect}");
+        
+        if (!canConnect)
+        {
+            Console.WriteLine("Cannot connect to database. Creating database...");
+        }
         
         // สร้าง database และตารางทั้งหมด
         context.Database.EnsureCreated();
         Console.WriteLine("Database and tables created successfully!");
         
         // ตรวจสอบว่าตาราง Books มีอยู่หรือไม่
-        var booksExist = context.Database.ExecuteSqlRaw("SELECT 1 FROM \"Books\" LIMIT 1") >= 0;
-        Console.WriteLine($"Books table exists: {booksExist}");
+        try
+        {
+            var booksExist = context.Database.ExecuteSqlRaw("SELECT 1 FROM \"Books\" LIMIT 1") >= 0;
+            Console.WriteLine($"Books table exists: {booksExist}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error checking Books table: {ex.Message}");
+        }
         
         // เพิ่มข้อมูลตัวอย่างถ้าตารางว่าง
         if (!context.Books.Any())
