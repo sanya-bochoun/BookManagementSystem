@@ -90,13 +90,58 @@ try
         // ตรวจสอบว่า database มีอยู่หรือไม่
         Console.WriteLine($"Database exists: {context.Database.CanConnect()}");
         
-        // ลบ database เดิม (ถ้ามี) แล้วสร้างใหม่
-        context.Database.EnsureDeleted();
-        Console.WriteLine("Old database deleted (if existed)");
-        
         // สร้าง database และตารางทั้งหมด
         context.Database.EnsureCreated();
         Console.WriteLine("Database and tables created successfully!");
+        
+        // ตรวจสอบว่าตาราง Books มีอยู่หรือไม่
+        var booksExist = context.Database.ExecuteSqlRaw("SELECT 1 FROM \"Books\" LIMIT 1") >= 0;
+        Console.WriteLine($"Books table exists: {booksExist}");
+        
+        // เพิ่มข้อมูลตัวอย่างถ้าตารางว่าง
+        if (!context.Books.Any())
+        {
+            Console.WriteLine("Adding sample data...");
+            
+            // เพิ่ม Categories
+            var categories = new List<Category>
+            {
+                new Category { Name = "Fiction" },
+                new Category { Name = "Non-Fiction" },
+                new Category { Name = "Science" }
+            };
+            context.Categories.AddRange(categories);
+            context.SaveChanges();
+            
+            // เพิ่ม Books
+            var books = new List<Book>
+            {
+                new Book { 
+                    Title = "Sample Book 1", 
+                    Author = "Author 1", 
+                    ISBN = "1234567890", 
+                    PublishedDate = DateTime.Now.AddYears(-1),
+                    Price = 29.99m,
+                    Description = "Sample book description",
+                    CoverImageUrl = "",
+                    CategoryId = categories[0].CategoryId
+                },
+                new Book { 
+                    Title = "Sample Book 2", 
+                    Author = "Author 2", 
+                    ISBN = "0987654321", 
+                    PublishedDate = DateTime.Now.AddYears(-2),
+                    Price = 39.99m,
+                    Description = "Another sample book description",
+                    CoverImageUrl = "",
+                    CategoryId = categories[1].CategoryId
+                }
+            };
+            context.Books.AddRange(books);
+            context.SaveChanges();
+            
+            Console.WriteLine("Sample data added successfully!");
+        }
     }
 }
 catch (Exception ex)

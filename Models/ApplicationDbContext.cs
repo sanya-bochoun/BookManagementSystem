@@ -37,10 +37,10 @@ namespace BookManagementSystem.Models
                 .WithOne(oi => oi.Order)
                 .HasForeignKey(oi => oi.OrderId);
 
-            // กำหนดค่าเริ่มต้นสำหรับ OrderDate
+            // กำหนดค่าเริ่มต้นสำหรับ OrderDate (รองรับทั้ง SQL Server และ PostgreSQL)
             modelBuilder.Entity<Order>()
                 .Property(o => o.OrderDate)
-                .HasDefaultValueSql("GETDATE()");
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         }
     }
 } 

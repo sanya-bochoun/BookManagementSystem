@@ -15,26 +15,66 @@ namespace BookManagementSystem.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var dashboardData = new DashboardViewModel
+            try
             {
-                TotalBooks = await _context.Books.CountAsync(),
-                TotalCategories = await _context.Categories.CountAsync(),
-                TotalCustomers = await _context.Customers.CountAsync(),
-                TotalOrders = await _context.Orders.CountAsync(),
-                TotalRevenue = await _context.Orders.SumAsync(o => o.TotalAmount),
-                RecentOrders = await _context.Orders
-                    .Include(o => o.Customer)
-                    .OrderByDescending(o => o.OrderDate)
-                    .Take(5)
-                    .ToListAsync(),
-                TopBooks = await _context.Books
-                    .Include(b => b.Category)
-                    .OrderByDescending(b => b.PublishedDate)
-                    .Take(5)
-                    .ToListAsync()
-            };
+                // ตรวจสอบว่าฐานข้อมูลพร้อมใช้งานหรือไม่
+                if (!_context.Database.CanConnect())
+                {
+                    return View(new DashboardViewModel
+                    {
+                        TotalBooks = 0,
+                        TotalCategories = 0,
+                        TotalCustomers = 0,
+                        TotalOrders = 0,
+                        TotalRevenue = 0,
+                        RecentOrders = new List<Order>(),
+                        TopBooks = new List<Book>()
+                    });
+                }
 
-            return View(dashboardData);
+                var dashboardData = new DashboardViewModel
+                {
+                    TotalBooks = await _context.Books.CountAsync(),
+                    TotalCategories = await _context.Categories.CountAsync(),
+                    TotalCustomers = await _context.Customers.CountAsync(),
+                    TotalOrders = await _context.Orders.CountAsync(),
+                    TotalRevenue = await _context.Orders.SumAsync(o => o.TotalAmount),
+                    RecentOrders = await _context.Orders
+                        .Include(o => o.Customer)
+                        .OrderByDescending(o => o.OrderDate)
+                        .Take(5)
+                        .ToListAsync(),
+                    TopBooks = await _context.Books
+                        .Include(b => b.Category)
+                        .OrderByDescending(b => b.PublishedDate)
+                        .Take(5)
+                        .ToListAsync()
+                };
+
+                return View(dashboardData);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in HomeController.Index: {ex.Message}");
+                
+                // Return empty dashboard if database is not ready
+                return View(new DashboardViewModel
+                {
+                    TotalBooks = 0,
+                    TotalCategories = 0,
+                    TotalCustomers = 0,
+                    TotalOrders = 0,
+                    TotalRevenue = 0,
+                    RecentOrders = new List<Order>(),
+                    TopBooks = new List<Book>()
+                });
+            }
+        }
+
+        public IActionResult Error()
+        {
+            return View();
         }
     }
 

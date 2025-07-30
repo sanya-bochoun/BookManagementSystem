@@ -3,9 +3,10 @@
 set -o errexit
 
 # Build the application
-dotnet restore
-dotnet build -c Release
-dotnet publish -c Release -o out
+dotnet build --configuration Release
 
-# Copy the published app to the output directory
-cp -r out/* . 
+# Publish the application
+dotnet publish --configuration Release --output ./publish
+
+# Copy the published files to the output directory
+cp -r ./publish/* ./ 

@@ -1,29 +1,31 @@
-# Build stage
+# Use the official .NET 8.0 runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 8080
+
+# Use the official .NET 8.0 SDK image for building
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy csproj and restore dependencies
+# Copy the project file and restore dependencies
 COPY ["BookManagementSystem.csproj", "./"]
 RUN dotnet restore "BookManagementSystem.csproj"
 
-# Copy everything else and build
+# Copy the rest of the source code
 COPY . .
+WORKDIR "/src"
+
+# Build the application
 RUN dotnet build "BookManagementSystem.csproj" -c Release -o /app/build
 
-# Publish stage
+# Publish the application
 FROM build AS publish
 RUN dotnet publish "BookManagementSystem.csproj" -c Release -o /app/publish
 
-# Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+# Build the final runtime image
+FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Expose port
-EXPOSE 8080
-
-# Set environment variables
-ENV ASPNETCORE_URLS=http://+:8080
-ENV ASPNETCORE_ENVIRONMENT=Production
-
+# Set the entry point
 ENTRYPOINT ["dotnet", "BookManagementSystem.dll"] 

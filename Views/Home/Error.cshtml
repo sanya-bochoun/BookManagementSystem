@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="text-center">
+    <h1 class="text-danger">Error</h1>
+    <h2 class="text-danger">เกิดข้อผิดพลาดในการประมวลผลคำขอ</h2>
+
+    <h3>Development Mode</h3>
+    <p>
+        การสลับไปยัง <strong>Development</strong> environment จะแสดงข้อมูลเพิ่มเติมเกี่ยวกับข้อผิดพลาดที่เกิดขึ้น
+    </p>
+    <p>
+        <strong>Development environment ไม่ควรเปิดใช้งานในแอปพลิเคชันที่ deploy แล้ว</strong>
+        เนื่องจากอาจส่งผลให้ข้อมูลที่ละเอียดอ่อนจาก exception ถูกแสดงให้ผู้ใช้เห็น
+        สำหรับการ debug ในเครื่อง local ให้ตั้งค่า <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable เป็น <strong>Development</strong>
+        และรีสตาร์ทแอปพลิเคชัน
+    </p>
+</div> 
