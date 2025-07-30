@@ -1,82 +1,28 @@
 # 📚 Book Management System
 
-A modern book management system built with ASP.NET Core 8.0, Entity Framework Core, and PostgreSQL
+A modern ASP.NET Core MVC application for managing books, customers, and orders with a beautiful UI.
 
-## 🌟 Features
+## ✨ Features
 
 - **📖 Book Management**: Add, edit, delete, and search books
-- **📂 Category Management**: Organize books by categories
 - **👥 Customer Management**: Manage customer information
-- **🛒 Order Management**: Handle orders and revenue
-- **📊 Dashboard**: Display statistics and summary data
-- **🖼️ Image Upload**: Support book cover uploads via Cloudinary
-- **📱 Responsive Design**: Works on all devices
-- **🔍 SEO Optimized**: Meta tags and favicon for SEO
+- **🛒 Order Management**: Create and track orders
+- **📂 Category Management**: Organize books by categories
+- **🖼️ Image Upload**: Cloudinary integration for book covers
+- **📱 Responsive Design**: Modern UI that works on all devices
+- **🔍 Search & Filter**: Find books by title, author, or category
+- **📊 Dashboard**: Overview with statistics and recent activities
 
-## 🛠️ Technology Stack
+## 🏗️ Architecture
 
-### Backend
-- **ASP.NET Core 8.0** - Web Framework
-- **Entity Framework Core** - ORM
-- **PostgreSQL** - Primary Database
-- **SQL Server LocalDB** - Development Database
+- **Framework**: ASP.NET Core 8.0 MVC
+- **Database**: PostgreSQL (Production) / SQL Server LocalDB (Development)
+- **ORM**: Entity Framework Core
+- **UI**: Bootstrap 5 + Font Awesome
+- **Image Storage**: Cloudinary
+- **Deployment**: Render / Railway
 
-### Frontend
-- **Bootstrap 5** - CSS Framework
-- **Font Awesome** - Icons
-- **jQuery** - JavaScript Library
-
-### Cloud Services
-- **Cloudinary** - Image Storage
-- **Render** - Hosting Platform
-
-## 📋 System Requirements
-
-- .NET 8.0 SDK
-- PostgreSQL (for Production)
-- SQL Server LocalDB (for Development)
-- Cloudinary Account (for Image Storage)
-
-## 🚀 Installation
-
-### 1. Clone Repository
-```bash
-git clone https://github.com/your-username/book-management-system.git
-cd book-management-system
-```
-
-### 2. Install Dependencies
-```bash
-dotnet restore
-```
-
-### 3. Setup Database
-
-#### For Development (SQL Server LocalDB)
-```bash
-dotnet ef database update
-```
-
-#### For Production (PostgreSQL)
-1. Create PostgreSQL database
-2. Set connection string in environment variables
-
-### 4. Setup Cloudinary (if using)
-Add environment variables:
-```bash
-Cloudinary__CloudName=your_cloud_name
-Cloudinary__ApiKey=your_api_key
-Cloudinary__ApiSecret=your_api_secret
-```
-
-### 5. Run Application
-```bash
-dotnet run
-```
-
-The application will run at: `https://localhost:7063` and `http://localhost:5272`
-
-## 🏗️ Project Structure
+## 📁 Project Structure
 
 ```
 BookManagementSystem/
@@ -85,9 +31,8 @@ BookManagementSystem/
 ├── Views/               # Razor Views
 ├── wwwroot/             # Static Files (CSS, JS, Images)
 ├── Services/            # Business Logic Services
-├── Data/                # Database Context
+├── Migrations/          # Database Migrations
 ├── Properties/          # Launch Settings
-├── Scripts/             # Utility Scripts
 └── README files/        # Documentation
 ```
 
@@ -183,87 +128,116 @@ docker build -t book-management-system .
 docker run -p 8080:8080 book-management-system
 ```
 
-## 🔍 Troubleshooting
+## 🛠️ Development
 
-### Common Issues
+### Prerequisites
+- .NET 8.0 SDK
+- Visual Studio 2022 or VS Code
+- SQL Server LocalDB (for development)
 
-#### 1. Database Connection Error
-```bash
-# Check connection string
-dotnet ef database update
-```
+### Setup
+1. **Clone Repository**
+   ```bash
+   git clone https://github.com/your-username/book-management-system.git
+   cd book-management-system
+   ```
 
-#### 2. DateTime Error (PostgreSQL)
-```bash
-# Check DateTime UTC conversion
-# See ApplicationDbContext.cs file
-```
+2. **Install Dependencies**
+   ```bash
+   dotnet restore
+   ```
 
-#### 3. Build Error
-```bash
-# Clear cache and rebuild
-dotnet clean
-dotnet restore
-dotnet build
-```
+3. **Setup Database**
+   ```bash
+   dotnet ef database update
+   ```
 
-### Logs and Debugging
-```bash
-# View logs
-dotnet run --environment Development
+4. **Run Application**
+   ```bash
+   dotnet run
+   ```
 
-# Check database
-dotnet ef database update
-```
+5. **Access Application**
+   - Open browser to `https://localhost:5001` or `http://localhost:5000`
 
-## 📚 API Documentation
+## 📊 Database Schema
 
-### Books API
-- `GET /Books` - Display book list
-- `GET /Books/Create` - Create book page
-- `POST /Books/Create` - Add new book
-- `GET /Books/Edit/{id}` - Edit book page
-- `PUT /Books/Edit/{id}` - Update book
-- `DELETE /Books/Delete/{id}` - Delete book
+### Books Table
+- `BookId` (Primary Key)
+- `Title` (Required, Max 200 chars)
+- `Author` (Required, Max 100 chars)
+- `PublishedDate` (Required)
+- `ISBN` (Required, Max 20 chars)
+- `CategoryId` (Foreign Key)
+- `Price` (Required, Decimal)
+- `CoverImageUrl` (Optional, Max 500 chars)
+- `Description` (Optional, Max 2000 chars)
 
-### Categories API
-- `GET /Categories` - Display category list
-- `POST /Categories/Create` - Add new category
+### Categories Table
+- `CategoryId` (Primary Key)
+- `Name` (Required, Max 100 chars)
 
-### Orders API
-- `GET /Orders` - Display order list
-- `POST /Orders/Create` - Create new order
+### Customers Table
+- `CustomerId` (Primary Key)
+- `Name` (Required, Max 100 chars)
+- `Email` (Required, Email format)
+- `Phone` (Required, Max 20 chars)
+
+### Orders Table
+- `OrderId` (Primary Key)
+- `CustomerId` (Foreign Key)
+- `OrderDate` (Required, Default: Current Timestamp)
+- `TotalAmount` (Decimal)
+
+### OrderItems Table
+- `OrderItemId` (Primary Key)
+- `OrderId` (Foreign Key)
+- `ProductName` (Required, Max 200 chars)
+- `Quantity` (Required, Min 1)
+- `UnitPrice` (Required, Decimal)
+- `SubTotal` (Computed: Quantity * UnitPrice)
+
+## 🔐 Security Features
+
+- **CSRF Protection**: Anti-forgery tokens on all forms
+- **Input Validation**: Server-side and client-side validation
+- **SQL Injection Prevention**: Entity Framework parameterized queries
+- **File Upload Security**: File type and size validation
+
+## 🎨 UI Features
+
+- **Modern Design**: Clean, responsive Bootstrap 5 interface
+- **Dark Theme**: Professional dark color scheme
+- **Icons**: Font Awesome icons throughout
+- **Animations**: Smooth transitions and hover effects
+- **Mobile Friendly**: Responsive design for all screen sizes
+
+## 📈 Performance
+
+- **Caching**: Static file caching
+- **Optimized Queries**: Efficient Entity Framework queries
+- **Image Optimization**: Cloudinary automatic image optimization
+- **Pagination**: Efficient data loading
 
 ## 🤝 Contributing
 
-1. Fork the project
-2. Create a Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-## 📝 License
+## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
-
-## 👨‍💻 Developer
-
-- **Developer Name** - [GitHub Profile](https://github.com/your-username)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-- [ASP.NET Core](https://dotnet.microsoft.com/) - Web Framework
-- [Entity Framework Core](https://docs.microsoft.com/en-us/ef/core/) - ORM
-- [Bootstrap](https://getbootstrap.com/) - CSS Framework
-- [Cloudinary](https://cloudinary.com/) - Image Storage
-- [Render](https://render.com/) - Hosting Platform
-
-## 📞 Contact
-
-- **Email**: your-email@example.com
-- **GitHub**: [@your-username](https://github.com/your-username)
-- **LinkedIn**: [Your Name](https://linkedin.com/in/your-profile)
+- [Bootstrap](https://getbootstrap.com/) for the UI framework
+- [Font Awesome](https://fontawesome.com/) for icons
+- [Cloudinary](https://cloudinary.com/) for image storage
+- [Entity Framework Core](https://docs.microsoft.com/en-us/ef/core/) for data access
 
 ---
 
-⭐ **If this project is helpful, please give it a Star!** ⭐ 
+**Note**: This application is designed for educational purposes and can be extended for production use with additional security measures. 
