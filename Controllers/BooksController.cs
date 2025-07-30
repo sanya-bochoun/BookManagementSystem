@@ -108,6 +108,12 @@ namespace BookManagementSystem.Controllers
                         return View(book);
                     }
 
+                    // แปลง DateTime เป็น UTC
+                    if (book.PublishedDate.Kind == DateTimeKind.Unspecified)
+                    {
+                        book.PublishedDate = DateTime.SpecifyKind(book.PublishedDate, DateTimeKind.Utc);
+                    }
+
                     if (coverImage != null)
                     {
                         try
