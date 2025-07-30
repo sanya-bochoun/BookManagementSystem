@@ -61,29 +61,6 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// สร้าง database และตารางอัตโนมัติ (ทำก่อน middleware)
-try
-{
-    Console.WriteLine("Starting database creation...");
-    using (var scope = app.Services.CreateScope())
-    {
-        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        
-        // ตรวจสอบว่า database มีอยู่หรือไม่
-        Console.WriteLine($"Database exists: {context.Database.CanConnect()}");
-        
-        // สร้าง database และตารางทั้งหมด
-        context.Database.EnsureCreated();
-        Console.WriteLine("Database and tables created successfully!");
-    }
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"Database creation error: {ex.Message}");
-    Console.WriteLine($"Stack trace: {ex.StackTrace}");
-    // Continue without database creation for now
-}
-
 // Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
@@ -101,5 +78,32 @@ app.UseRouting();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// สร้าง database และตารางอัตโนมัติ (ทำหลัง middleware setup)
+try
+{
+    Console.WriteLine("Starting database creation...");
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        
+        // ตรวจสอบว่า database มีอยู่หรือไม่
+        Console.WriteLine($"Database exists: {context.Database.CanConnect()}");
+        
+        // ลบ database เดิม (ถ้ามี) แล้วสร้างใหม่
+        context.Database.EnsureDeleted();
+        Console.WriteLine("Old database deleted (if existed)");
+        
+        // สร้าง database และตารางทั้งหมด
+        context.Database.EnsureCreated();
+        Console.WriteLine("Database and tables created successfully!");
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Database creation error: {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+    // Continue without database creation for now
+}
 
 app.Run();
