@@ -83,17 +83,58 @@ namespace BookManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Title,Author,PublishedDate,ISBN,CategoryId,Price,Description")] Book book, IFormFile? coverImage)
         {
-            if (ModelState.IsValid)
+            try
             {
-                if (coverImage != null)
+                if (ModelState.IsValid)
                 {
-                    book.CoverImageUrl = await _cloudinaryService.UploadImageAsync(coverImage);
-                }
+                    // ตรวจสอบว่าฐานข้อมูลพร้อมใช้งานหรือไม่
+                    if (!_context.Database.CanConnect())
+                    {
+                        ModelState.AddModelError("", "ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
+                        ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
+                        return View(book);
+                    }
 
-                _context.Add(book);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                    // ตรวจสอบว่าตาราง Books มีอยู่หรือไม่
+                    try
+                    {
+                        var booksExist = _context.Database.ExecuteSqlRaw("SELECT 1 FROM \"Books\" LIMIT 1");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error checking Books table: {ex.Message}");
+                        ModelState.AddModelError("", "ฐานข้อมูลยังไม่พร้อมใช้งาน กรุณาลองใหม่อีกครั้ง");
+                        ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
+                        return View(book);
+                    }
+
+                    if (coverImage != null)
+                    {
+                        try
+                        {
+                            book.CoverImageUrl = await _cloudinaryService.UploadImageAsync(coverImage);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error uploading image: {ex.Message}");
+                            // Continue without image upload
+                            book.CoverImageUrl = "";
+                        }
+                    }
+
+                    _context.Add(book);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in BooksController.Create: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                
+                ModelState.AddModelError("", "เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง");
+            }
+            
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
             return View(book);
         }
