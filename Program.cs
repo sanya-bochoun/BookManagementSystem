@@ -61,20 +61,7 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
-
-// ใช้งาน static files (ถ้ามี wwwroot)
-app.UseStaticFiles();
-
-// ใช้งาน routing
-app.UseRouting();
-
-// สร้าง database และตารางอัตโนมัติ
+// สร้าง database และตารางอัตโนมัติ (ทำก่อน middleware)
 try
 {
     Console.WriteLine("Starting database creation...");
@@ -96,6 +83,19 @@ catch (Exception ex)
     Console.WriteLine($"Stack trace: {ex.StackTrace}");
     // Continue without database creation for now
 }
+
+// Configure the HTTP request pipeline
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+// ใช้งาน static files (ถ้ามี wwwroot)
+app.UseStaticFiles();
+
+// ใช้งาน routing
+app.UseRouting();
 
 // ใช้งาน endpoints สำหรับ Controller + View
 app.MapControllerRoute(
