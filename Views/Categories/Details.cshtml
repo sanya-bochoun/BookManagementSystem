@@ -1,15 +1,15 @@
 @model BookManagementSystem.Models.Category
 @{
-    ViewData["Title"] = "รายละเอียดหมวดหมู่";
+    ViewData["Title"] = "Category Details";
 }
 <h2>@ViewData["Title"]</h2>
 <div class="card mb-3">
     <div class="card-body">
         <dl class="row">
-            <dt class="col-sm-3">ชื่อหมวดหมู่</dt>
+            <dt class="col-sm-3">Category Name</dt>
             <dd class="col-sm-9">@Model.Name</dd>
         </dl>
-        <h5>รายการหนังสือในหมวดหมู่นี้</h5>
+        <h5>Books in this category</h5>
         @if (Model.Books != null && Model.Books.Any())
         {
             <ul>
@@ -21,9 +21,9 @@
         }
         else
         {
-            <p class="text-muted">ไม่มีหนังสือในหมวดหมู่นี้</p>
+            <p class="text-muted">No books in this category</p>
         }
-        <a asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn btn-warning">แก้ไข</a>
-        <a asp-action="Index" class="btn btn-secondary">กลับ</a>
+        <a asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn btn-warning">Edit</a>
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
     </div>
 </div> 

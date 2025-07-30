@@ -1,6 +1,6 @@
 @model IEnumerable<BookManagementSystem.Models.Book>
 @{
-    ViewData["Title"] = "รายการหนังสือ";
+    ViewData["Title"] = "Book List";
     var searchString = ViewBag.SearchString as string;
     var categoryId = ViewBag.CategoryId as int?;
     var currentPage = ViewBag.CurrentPage as int? ?? 1;
@@ -9,18 +9,18 @@
     var categories = ViewBag.Categories as SelectList;
 }
 <div class="glass-card mt-4">
-    <h2 class="mb-4 text-white"><i class="fas fa-book me-2"></i>รายการหนังสือ</h2>
+    <h2 class="mb-4 text-white"><i class="fas fa-book me-2"></i>Book List</h2>
     
     <!-- Search and Filter Form -->
     <form method="get" class="row g-3 mb-4">
         <div class="col-md-4">
-            <label class="form-label">ค้นหาชื่อหนังสือหรือผู้แต่ง</label>
-            <input type="text" name="searchString" class="form-control" value="@searchString" placeholder="ค้นหาชื่อหนังสือหรือผู้แต่ง..." />
+            <label class="form-label">Search book title or author</label>
+            <input type="text" name="searchString" class="form-control" value="@searchString" placeholder="Search book title or author..." />
         </div>
         <div class="col-md-3">
-            <label class="form-label">หมวดหมู่</label>
+            <label class="form-label">Category</label>
             <select name="categoryId" class="form-control">
-                <option value="">-- ทุกหมวดหมู่ --</option>
+                <option value="">-- All Categories --</option>
                 @if (categories != null)
                 {
                     foreach (var item in categories)
@@ -40,13 +40,13 @@
         <div class="col-md-2">
             <label class="form-label">&nbsp;</label>
             <button type="submit" class="btn btn-primary w-100">
-                <i class="fas fa-search me-1"></i>ค้นหา
+                <i class="fas fa-search me-1"></i>Search
             </button>
         </div>
         <div class="col-md-3">
             <label class="form-label">&nbsp;</label>
             <a asp-action="Create" class="btn btn-success w-100">
-                <i class="fas fa-plus me-1"></i>เพิ่มหนังสือ
+                <i class="fas fa-plus me-1"></i>Add Book
             </a>
         </div>
     </form>
@@ -54,10 +54,10 @@
     <!-- Results Summary -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <span class="text-white">แสดงผล @Model.Count() รายการ จากทั้งหมด @totalBooks รายการ</span>
+            <span class="text-white">Showing @Model.Count() items of @totalBooks total</span>
         </div>
         <div>
-            <span class="text-white">หน้า @currentPage จาก @totalPages</span>
+            <span class="text-white">Page @currentPage of @totalPages</span>
         </div>
     </div>
     
@@ -65,14 +65,14 @@
     <table class="table table-bordered table-striped bg-white rounded shadow-sm">
         <thead>
             <tr>
-                    <th style="width: 80px;">รูปปก</th>
-                <th>ชื่อหนังสือ</th>
-                <th>ผู้แต่ง</th>
-                <th>วันที่ตีพิมพ์</th>
+                    <th style="width: 80px;">Cover</th>
+                <th>Book Title</th>
+                <th>Author</th>
+                <th>Published Date</th>
                 <th>ISBN</th>
-                <th>หมวดหมู่</th>
-                    <th>ราคา</th>
-                    <th style="width: 120px;">จัดการ</th>
+                <th>Category</th>
+                    <th>Price</th>
+                    <th style="width: 120px;">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -96,16 +96,16 @@
                     <td>@item.PublishedDate.ToString("dd/MM/yyyy")</td>
                 <td>@item.ISBN</td>
                 <td>@item.Category?.Name</td>
-                    <td>@item.Price.ToString("N2") บาท</td>
+                    <td>@item.Price.ToString("N2") THB</td>
                     <td>
                         <div class="btn-group" role="group">
-                            <a asp-action="Details" asp-route-id="@item.BookId" class="btn btn-info btn-sm" title="ดูรายละเอียด">
+                            <a asp-action="Details" asp-route-id="@item.BookId" class="btn btn-info btn-sm" title="View Details">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a asp-action="Edit" asp-route-id="@item.BookId" class="btn btn-warning btn-sm" title="แก้ไข">
+                            <a asp-action="Edit" asp-route-id="@item.BookId" class="btn btn-warning btn-sm" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a asp-action="Delete" asp-route-id="@item.BookId" class="btn btn-danger btn-sm" title="ลบ">
+                            <a asp-action="Delete" asp-route-id="@item.BookId" class="btn btn-danger btn-sm" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
@@ -126,14 +126,14 @@
                 {
                     <li class="page-item">
                         <a class="page-link" href="@Url.Action("Index", new { searchString = searchString, categoryId = categoryId, page = currentPage - 1 })">
-                            <i class="fas fa-chevron-left"></i> ก่อนหน้า
+                            <i class="fas fa-chevron-left"></i> Previous
                         </a>
                     </li>
                 }
                 else
                 {
                     <li class="page-item disabled">
-                        <span class="page-link"><i class="fas fa-chevron-left"></i> ก่อนหน้า</span>
+                        <span class="page-link"><i class="fas fa-chevron-left"></i> Previous</span>
                     </li>
                 }
                 
@@ -190,14 +190,14 @@
                 {
                     <li class="page-item">
                         <a class="page-link" href="@Url.Action("Index", new { searchString = searchString, categoryId = categoryId, page = currentPage + 1 })">
-                            ถัดไป <i class="fas fa-chevron-right"></i>
+                            Next <i class="fas fa-chevron-right"></i>
                         </a>
                     </li>
                 }
                 else
                 {
                     <li class="page-item disabled">
-                        <span class="page-link">ถัดไป <i class="fas fa-chevron-right"></i></span>
+                        <span class="page-link">Next <i class="fas fa-chevron-right"></i></span>
                     </li>
                 }
             </ul>
@@ -208,8 +208,8 @@
     {
         <div class="text-center py-5">
             <i class="fas fa-book fa-4x text-muted mb-3"></i>
-            <h4 class="text-muted">ไม่พบหนังสือ</h4>
-            <p class="text-muted">ลองเปลี่ยนคำค้นหาหรือหมวดหมู่</p>
+            <h4 class="text-muted">No books found</h4>
+            <p class="text-muted">Try changing search terms or category</p>
         </div>
     }
 </div>

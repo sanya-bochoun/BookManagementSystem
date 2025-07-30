@@ -1,104 +1,322 @@
-# การแก้ไขปัญหา Book Management System
+# 🔧 Troubleshooting Guide
 
-## ปัญหา: ไม่สามารถเพิ่มหนังสือได้ (HTTP 500 Error)
+## 🚨 Common Issues and Solutions
 
-### สาเหตุที่เป็นไปได้
+### 1. Build Errors
 
-1. **ฐานข้อมูลยังไม่ถูกสร้าง**
-   - ตาราง "Books" ไม่มีอยู่
-   - Connection String ไม่ถูกตั้งค่า
-
-2. **Environment Variables ไม่ครบถ้วน**
-   - `ConnectionStrings__DefaultConnection` ไม่ถูกตั้งค่า
-   - Cloudinary Configuration ไม่ครบถ้วน
-
-3. **ฐานข้อมูลไม่สามารถเชื่อมต่อได้**
-   - Network connectivity issues
-   - Database permissions
-
-### การแก้ไข
-
-#### 1. ตรวจสอบฐานข้อมูล
-
-**ใน Render:**
-1. ไปที่ Dashboard → Services
-2. ตรวจสอบว่ามี PostgreSQL database ชื่อ `book-management-db`
-3. ตรวจสอบ Environment Variables ของ Web Service
-
-**ใน Railway:**
-1. ไปที่ Project Dashboard
-2. ตรวจสอบว่ามี PostgreSQL service
-3. ตรวจสอบ Variables ของ Web Service
-
-#### 2. ตั้งค่า Environment Variables
-
-**Connection String:**
+#### Duplicate Assembly Attributes Error
 ```
-Key: ConnectionStrings__DefaultConnection
-Value: [Connection String จากฐานข้อมูล]
+error CS0579: Duplicate 'System.Reflection.AssemblyCompanyAttribute' attribute
 ```
 
-**Cloudinary Configuration:**
+**Solution**:
+1. Clean build cache:
+   ```bash
+   dotnet clean
+   Remove-Item -Recurse -Force obj, bin
+   ```
+
+2. Update .csproj file:
+   ```xml
+   <PropertyGroup>
+     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+     <UseAppHost>false</UseAppHost>
+   </PropertyGroup>
+   ```
+
+3. Rebuild:
+   ```bash
+   dotnet restore
+   dotnet build
+   ```
+
+#### AppHost Access Denied Error
 ```
-Key: Cloudinary__CloudName
-Value: ddlnfwevx
-
-Key: Cloudinary__ApiKey
-Value: 735976651797734
-
-Key: Cloudinary__ApiSecret
-Value: v5bBR1OO5hlktSoBW0bCusP6SeE
+Access to the path 'apphost.exe' is denied
 ```
 
-#### 3. ตรวจสอบ Logs
+**Solution**:
+1. Kill running processes:
+   ```bash
+   taskkill /f /im dotnet.exe
+   taskkill /f /im apphost.exe
+   ```
 
-หลังจาก Deploy ใหม่ ให้ตรวจสอบ Logs:
+2. Clean and rebuild:
+   ```bash
+   dotnet clean
+   dotnet build
+   ```
 
-**Logs ที่ควรเห็น:**
+### 2. Database Issues
+
+#### Database Connection Error
 ```
-Connection String: Host=xxx;Port=5432;Database=xxx;Username=xxx;Password=***
+System.InvalidOperationException: No database provider has been configured
+```
+
+**Solution**:
+1. Check connection string in `appsettings.json`
+2. Verify environment variables
+3. Run database update:
+   ```bash
+   dotnet ef database update
+   ```
+
+#### Table Not Found Error
+```
+relation "Books" does not exist
+```
+
+**Solution**:
+1. Ensure database is created:
+   ```csharp
+   context.Database.EnsureCreated();
+   ```
+
+2. Check if tables exist:
+   ```bash
+   dotnet ef database update
+   ```
+
+#### DateTime Error (PostgreSQL)
+```
+Cannot write DateTime with Kind=Unspecified to PostgreSQL type 'timestamp with time zone'
+```
+
+**Solution**:
+1. Convert DateTime to UTC:
+   ```csharp
+   if (book.PublishedDate.Kind == DateTimeKind.Unspecified)
+   {
+       book.PublishedDate = DateTime.SpecifyKind(book.PublishedDate, DateTimeKind.Utc);
+   }
+   ```
+
+2. Configure Entity Framework:
+   ```csharp
+   modelBuilder.Entity<Book>()
+       .Property(b => b.PublishedDate)
+       .HasColumnType("timestamp with time zone");
+   ```
+
+### 3. Deployment Issues
+
+#### Environment Variables Not Set
+```
+Configuration value 'ConnectionStrings:DefaultConnection' was not found
+```
+
+**Solution**:
+1. Set environment variables in hosting platform
+2. Check variable names (use double underscores)
+3. Verify connection string format
+
+#### Build Command Errors
+```
+Build failed: dotnet build command not found
+```
+
+**Solution**:
+1. Use correct build command:
+   ```bash
+   dotnet build --configuration Release
+   ```
+
+2. Check .NET SDK version
+3. Verify build script permissions
+
+### 4. Runtime Issues
+
+#### Antiforgery Token Error
+```
+The antiforgery token could not be decrypted
+```
+
+**Solution**:
+1. Configure Data Protection:
+   ```csharp
+   services.AddDataProtection()
+       .PersistKeysToFileSystem(new DirectoryInfo(@"/app/keys"))
+       .SetApplicationName("BookManagementSystem");
+   ```
+
+2. Or disable antiforgery temporarily for testing
+
+#### Image Upload Failures
+```
+Cloudinary upload failed
+```
+
+**Solution**:
+1. Check Cloudinary credentials
+2. Verify image file format
+3. Check file size limits
+4. Add error handling:
+   ```csharp
+   try
+   {
+       book.CoverImageUrl = await _cloudinaryService.UploadImageAsync(coverImage);
+   }
+   catch (Exception ex)
+   {
+       book.CoverImageUrl = "";
+   }
+   ```
+
+## 🔍 Debugging Commands
+
+### Database Debugging
+```bash
+# Check database connection
+dotnet ef database update
+
+# View database info
+dotnet ef dbcontext info
+
+# Generate SQL script
+dotnet ef migrations script
+```
+
+### Application Debugging
+```bash
+# Run with detailed logging
+dotnet run --environment Development
+
+# Check configuration
+dotnet run --configuration Debug
+
+# View logs
+dotnet run --verbosity detailed
+```
+
+### Build Debugging
+```bash
+# Clean build
+dotnet clean
+dotnet restore
+dotnet build
+
+# Publish for production
+dotnet publish --configuration Release
+```
+
+## 📊 Log Analysis
+
+### Common Log Patterns
+
+#### Database Connection Success
+```
+Connection String: Server=xxx;Database=xxx
 Database can connect: True
 Database and tables created successfully!
-Books table exists: True
-Sample data added successfully!
 ```
 
-**Logs ที่แสดงปัญหา:**
+#### Database Connection Failure
 ```
-Connection String is null or empty!
 Database can connect: False
-Error checking Books table: relation "Books" does not exist
+Database creation error: [Error message]
 ```
 
-#### 4. การแก้ไขในโค้ด
+#### Application Startup Success
+```
+Now listening on: http://localhost:5272
+Application started. Press Ctrl+C to shut down.
+```
 
-**BooksController.Create()** ได้รับการปรับปรุงแล้ว:
-- เพิ่มการตรวจสอบการเชื่อมต่อฐานข้อมูล
-- เพิ่มการจัดการข้อผิดพลาด
-- เพิ่มการแสดงข้อผิดพลาดที่ชัดเจน
+#### Application Startup Failure
+```
+Unhandled exception. System.InvalidOperationException: [Error message]
+```
 
-**Create.cshtml** ได้รับการปรับปรุงแล้ว:
-- แสดงข้อผิดพลาดจาก ModelState
-- แสดงข้อผิดพลาดทั่วไป
+## 🛠️ Environment-Specific Issues
 
-### การทดสอบ
+### Development Environment
 
-1. **ทดสอบการเชื่อมต่อฐานข้อมูล:**
-   - ไปที่หน้าแรก (Home)
-   - ตรวจสอบว่าแสดงข้อมูลได้
+#### LocalDB Issues
+```
+Login failed for user 'NT AUTHORITY\ANONYMOUS LOGON'
+```
 
-2. **ทดสอบการเพิ่มหนังสือ:**
-   - ไปที่ Books → Create
-   - กรอกข้อมูลและบันทึก
-   - ตรวจสอบว่าไม่เกิด HTTP 500
+**Solution**:
+1. Use Windows Authentication
+2. Run as Administrator
+3. Check LocalDB installation
 
-3. **ตรวจสอบ Logs:**
-   - ดู Logs ใน Render/Railway
-   - ตรวจสอบข้อผิดพลาดที่เกิดขึ้น
+#### Port Conflicts
+```
+Address already in use
+```
 
-### การป้องกันปัญหาในอนาคต
+**Solution**:
+1. Change port in `launchSettings.json`
+2. Kill conflicting processes
+3. Use different port range
 
-1. **ตรวจสอบฐานข้อมูลก่อน Deploy**
-2. **ตั้งค่า Environment Variables ให้ครบถ้วน**
-3. **ตรวจสอบ Logs หลัง Deploy**
-4. **ทดสอบฟีเจอร์หลักหลัง Deploy** 
+### Production Environment
+
+#### Memory Issues
+```
+OutOfMemoryException
+```
+
+**Solution**:
+1. Increase memory limits
+2. Optimize database queries
+3. Use connection pooling
+
+#### SSL Certificate Issues
+```
+SSL certificate validation failed
+```
+
+**Solution**:
+1. Configure SSL properly
+2. Use valid certificates
+3. Check certificate expiration
+
+## 📞 Getting Help
+
+### Before Asking for Help
+
+1. **Check Logs**: Look at application and deployment logs
+2. **Reproduce Issue**: Try to reproduce the issue locally
+3. **Search Documentation**: Check official documentation
+4. **Check Issues**: Look for similar issues in GitHub
+
+### When Reporting Issues
+
+Include the following information:
+
+1. **Environment Details**:
+   - OS and version
+   - .NET version
+   - Database type and version
+
+2. **Error Details**:
+   - Full error message
+   - Stack trace
+   - Steps to reproduce
+
+3. **Configuration**:
+   - Connection string (without credentials)
+   - Environment variables
+   - Build configuration
+
+4. **Logs**:
+   - Application logs
+   - Deployment logs
+   - Database logs
+
+### Useful Resources
+
+- [ASP.NET Core Documentation](https://docs.microsoft.com/en-us/aspnet/core/)
+- [Entity Framework Documentation](https://docs.microsoft.com/en-us/ef/core/)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [Render Documentation](https://render.com/docs)
+- [Railway Documentation](https://docs.railway.app/)
+
+---
+
+**Note**: This troubleshooting guide covers the most common issues. For specific problems, please check the official documentation or create an issue with detailed information. 

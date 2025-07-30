@@ -8,17 +8,17 @@ namespace BookManagementSystem.Models
         [Key]
         public int OrderId { get; set; }
 
-        [Required(ErrorMessage = "กรุณาเลือกลูกค้า")]
+        [Required(ErrorMessage = "Please select customer")]
         [ForeignKey("Customer")]
         public int CustomerId { get; set; }
         public Customer? Customer { get; set; }
 
-        [Required(ErrorMessage = "กรุณาเลือกวันที่สั่งซื้อ")]
+        [Required(ErrorMessage = "Please select order date")]
         [DataType(DataType.Date)]
-        [Display(Name = "วันที่สั่งซื้อ")]
+        [Display(Name = "Order Date")]
         public DateTime OrderDate { get; set; } = DateTime.Now;
 
-        [Display(Name = "ยอดรวม")]
+        [Display(Name = "Total Amount")]
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
 

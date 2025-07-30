@@ -1,11 +1,11 @@
 @model BookManagementSystem.Models.Order
 @{
-    ViewData["Title"] = "แก้ไขคำสั่งซื้อ";
+    ViewData["Title"] = "Edit Order";
     var customers = ViewBag.Customers as List<BookManagementSystem.Models.Customer>;
 }
 
 <div class="glass-card mt-4">
-    <h2 class="mb-4 text-white"><i class="fas fa-edit me-2"></i>แก้ไขคำสั่งซื้อ</h2>
+    <h2 class="mb-4 text-white"><i class="fas fa-edit me-2"></i>Edit Order</h2>
     
     <form asp-action="Edit" method="post" id="orderForm">
         @Html.AntiForgeryToken()
@@ -16,13 +16,13 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>ข้อมูลคำสั่งซื้อ</h5>
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Order Information</h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label asp-for="CustomerId" class="form-label">ลูกค้า</label>
+                            <label asp-for="CustomerId" class="form-label">Customer</label>
                             <select asp-for="CustomerId" class="form-control" required>
-                                <option value="">-- เลือกลูกค้า --</option>
+                                <option value="">-- Select Customer --</option>
                                 @if (customers != null)
                                 {
                                     foreach (var customer in customers)
@@ -46,7 +46,7 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label asp-for="OrderDate" class="form-label">วันที่สั่งซื้อ</label>
+                            <label asp-for="OrderDate" class="form-label">Order Date</label>
                             <input asp-for="OrderDate" class="form-control" type="date" required />
                             <span asp-validation-for="OrderDate" class="text-danger"></span>
                         </div>
@@ -57,17 +57,17 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>สรุปยอด</h5>
+                        <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>Summary</h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-6">
-                                <label class="form-label">จำนวนรายการ:</label>
+                                <label class="form-label">Number of Items:</label>
                                 <h4 id="itemCount">0</h4>
                             </div>
                             <div class="col-6">
-                                <label class="form-label">ยอดรวม:</label>
-                                <h4 id="totalAmount" class="text-primary">0.00 บาท</h4>
+                                <label class="form-label">Total Amount:</label>
+                                <h4 id="totalAmount" class="text-primary">0.00 THB</h4>
                             </div>
                         </div>
                     </div>
@@ -77,9 +77,9 @@
         
         <div class="card mt-3">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-list me-2"></i>รายการสินค้า</h5>
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>Order Items</h5>
                 <button type="button" class="btn btn-success btn-sm" onclick="addOrderItem()">
-                    <i class="fas fa-plus me-1"></i>เพิ่มรายการ
+                    <i class="fas fa-plus me-1"></i>Add Item
                 </button>
             </div>
             <div class="card-body">
@@ -93,10 +93,10 @@
         
         <div class="d-flex gap-2 mt-3">
             <button type="submit" class="btn btn-modern" onclick="prepareOrderItems()">
-                <i class="fas fa-save me-1"></i>บันทึกการแก้ไข
+                <i class="fas fa-save me-1"></i>Save Changes
             </button>
             <a asp-action="Index" class="btn btn-secondary-modern">
-                <i class="fas fa-arrow-left me-1"></i>กลับ
+                <i class="fas fa-arrow-left me-1"></i>Back
             </a>
         </div>
     </form>
@@ -133,19 +133,19 @@ function addOrderItem(productName = '', quantity = 1, unitPrice = 0) {
     
     itemDiv.innerHTML = `
         <div class="col-md-4">
-            <label class="form-label">ชื่อสินค้า</label>
-            <input type="text" class="form-control product-name" placeholder="ชื่อสินค้า" value="${productName}" required>
+            <label class="form-label">Product Name</label>
+            <input type="text" class="form-control product-name" placeholder="Product name" value="${productName}" required>
         </div>
         <div class="col-md-2">
-            <label class="form-label">จำนวน</label>
+            <label class="form-label">Quantity</label>
             <input type="number" class="form-control quantity" min="1" value="${quantity}" required onchange="calculateSubTotal(${itemCounter})">
         </div>
         <div class="col-md-2">
-            <label class="form-label">ราคาต่อหน่วย</label>
+            <label class="form-label">Unit Price</label>
             <input type="number" class="form-control unit-price" min="0.01" step="0.01" value="${unitPrice}" required onchange="calculateSubTotal(${itemCounter})">
         </div>
         <div class="col-md-2">
-            <label class="form-label">ยอดรวม</label>
+            <label class="form-label">Sub Total</label>
             <input type="text" class="form-control sub-total" readonly value="${(quantity * unitPrice).toFixed(2)}">
         </div>
         <div class="col-md-2">
@@ -189,7 +189,7 @@ function updateSummary() {
     });
     
     document.getElementById('itemCount').textContent = items.length;
-    document.getElementById('totalAmount').textContent = totalAmount.toFixed(2) + ' บาท';
+    document.getElementById('totalAmount').textContent = totalAmount.toFixed(2) + ' THB';
 }
 
 function prepareOrderItems() {

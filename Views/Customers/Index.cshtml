@@ -1,13 +1,13 @@
 @model IEnumerable<BookManagementSystem.Models.Customer>
 @{
-    ViewData["Title"] = "รายการลูกค้า";
+    ViewData["Title"] = "Customer List";
 }
 <div class="glass-card mt-4">
-    <h2 class="mb-4 text-white"><i class="fas fa-users me-2"></i>รายการลูกค้า</h2>
+    <h2 class="mb-4 text-white"><i class="fas fa-users me-2"></i>Customer List</h2>
     
     <div class="mb-3">
         <a asp-action="Create" class="btn btn-modern">
-            <i class="fas fa-plus me-1"></i>เพิ่มลูกค้าใหม่
+            <i class="fas fa-plus me-1"></i>Add New Customer
         </a>
     </div>
     
@@ -15,10 +15,10 @@
         <table class="table table-bordered table-striped bg-white rounded shadow-sm">
             <thead>
                 <tr>
-                    <th>ชื่อลูกค้า</th>
-                    <th>อีเมล</th>
-                    <th>เบอร์โทรศัพท์</th>
-                    <th style="width: 120px;">จัดการ</th>
+                    <th>Customer Name</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th style="width: 120px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -30,13 +30,13 @@
                     <td>@item.Phone</td>
                     <td>
                         <div class="btn-group" role="group">
-                            <a asp-action="Details" asp-route-id="@item.CustomerId" class="btn btn-info btn-sm" title="ดูรายละเอียด">
+                            <a asp-action="Details" asp-route-id="@item.CustomerId" class="btn btn-info btn-sm" title="View Details">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a asp-action="Edit" asp-route-id="@item.CustomerId" class="btn btn-warning btn-sm" title="แก้ไข">
+                            <a asp-action="Edit" asp-route-id="@item.CustomerId" class="btn btn-warning btn-sm" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a asp-action="Delete" asp-route-id="@item.CustomerId" class="btn btn-danger btn-sm" title="ลบ">
+                            <a asp-action="Delete" asp-route-id="@item.CustomerId" class="btn btn-danger btn-sm" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
@@ -51,8 +51,8 @@
     {
         <div class="text-center py-5">
             <i class="fas fa-users fa-4x text-muted mb-3"></i>
-            <h4 class="text-muted">ไม่พบลูกค้า</h4>
-            <p class="text-muted">เริ่มต้นโดยการเพิ่มลูกค้าใหม่</p>
+            <h4 class="text-muted">No customers found</h4>
+            <p class="text-muted">Start by adding a new customer</p>
         </div>
     }
 </div> 

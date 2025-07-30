@@ -19,30 +19,30 @@ namespace BookManagementSystem.Models
         {
             base.OnModelCreating(modelBuilder);
             
-            // กำหนดความสัมพันธ์ 1:N ระหว่าง Category กับ Book
+            // Define 1:N relationship between Category and Book
             modelBuilder.Entity<Category>()
                 .HasMany(c => c.Books)
                 .WithOne(b => b.Category)
                 .HasForeignKey(b => b.CategoryId);
 
-            // กำหนดความสัมพันธ์ 1:N ระหว่าง Customer กับ Order
+            // Define 1:N relationship between Customer and Order
             modelBuilder.Entity<Customer>()
                 .HasMany(c => c.Orders)
                 .WithOne(o => o.Customer)
                 .HasForeignKey(o => o.CustomerId);
 
-            // กำหนดความสัมพันธ์ 1:N ระหว่าง Order กับ OrderItem
+            // Define 1:N relationship between Order and OrderItem
             modelBuilder.Entity<Order>()
                 .HasMany(o => o.OrderItems)
                 .WithOne(oi => oi.Order)
                 .HasForeignKey(oi => oi.OrderId);
 
-            // กำหนดค่าเริ่มต้นสำหรับ OrderDate (รองรับทั้ง SQL Server และ PostgreSQL)
+            // Set default value for OrderDate (support both SQL Server and PostgreSQL)
             modelBuilder.Entity<Order>()
                 .Property(o => o.OrderDate)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-            // กำหนดค่า DateTime สำหรับ PostgreSQL
+            // Set DateTime for PostgreSQL
             modelBuilder.Entity<Book>()
                 .Property(b => b.PublishedDate)
                 .HasColumnType("timestamp with time zone");
@@ -50,7 +50,7 @@ namespace BookManagementSystem.Models
 
         public override int SaveChanges()
         {
-            // แปลง DateTime เป็น UTC ก่อนบันทึก
+            // Convert DateTime to UTC before saving
             var entries = ChangeTracker.Entries()
                 .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
@@ -77,7 +77,7 @@ namespace BookManagementSystem.Models
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            // แปลง DateTime เป็น UTC ก่อนบันทึก
+            // Convert DateTime to UTC before saving
             var entries = ChangeTracker.Entries()
                 .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 

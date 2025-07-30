@@ -1,33 +1,33 @@
 @model BookManagementSystem.Models.Customer
 @{
-    ViewData["Title"] = "ลบลูกค้า";
+    ViewData["Title"] = "Delete Customer";
 }
 <div class="glass-card mt-4">
-    <h2 class="mb-4 text-white"><i class="fas fa-trash me-2"></i>ลบลูกค้า</h2>
+    <h2 class="mb-4 text-white"><i class="fas fa-trash me-2"></i>Delete Customer</h2>
     
     <div class="alert alert-danger">
-        <h5><i class="fas fa-exclamation-triangle me-2"></i>คุณแน่ใจหรือไม่ที่จะลบลูกค้านี้?</h5>
-        <p class="mb-0">การดำเนินการนี้ไม่สามารถยกเลิกได้</p>
+        <h5><i class="fas fa-exclamation-triangle me-2"></i>Are you sure you want to delete this customer?</h5>
+        <p class="mb-0">This action cannot be undone</p>
     </div>
     
     <div class="card">
         <div class="card-header">
-            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>ข้อมูลลูกค้าที่จะลบ</h5>
+            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Customer Information to Delete</h5>
         </div>
         <div class="card-body">
             <dl class="row">
-                <dt class="col-sm-4">ชื่อลูกค้า:</dt>
+                <dt class="col-sm-4">Customer Name:</dt>
                 <dd class="col-sm-8">@Model.Name</dd>
                 
-                <dt class="col-sm-4">อีเมล:</dt>
+                <dt class="col-sm-4">Email:</dt>
                 <dd class="col-sm-8">@Model.Email</dd>
                 
-                <dt class="col-sm-4">เบอร์โทรศัพท์:</dt>
+                <dt class="col-sm-4">Phone Number:</dt>
                 <dd class="col-sm-8">@Model.Phone</dd>
                 
-                <dt class="col-sm-4">จำนวนคำสั่งซื้อ:</dt>
+                <dt class="col-sm-4">Number of Orders:</dt>
                 <dd class="col-sm-8">
-                    <span class="badge bg-info">@Model.Orders.Count รายการ</span>
+                    <span class="badge bg-info">@Model.Orders.Count items</span>
                 </dd>
             </dl>
         </div>
@@ -36,8 +36,8 @@
     @if (Model.Orders.Any())
     {
         <div class="alert alert-warning mt-3">
-            <h6><i class="fas fa-warning me-2"></i>คำเตือน</h6>
-            <p class="mb-0">ลูกค้าคนนี้มีประวัติการสั่งซื้อ @Model.Orders.Count รายการ การลบลูกค้าจะทำให้ข้อมูลคำสั่งซื้อทั้งหมดหายไปด้วย</p>
+            <h6><i class="fas fa-warning me-2"></i>Warning</h6>
+            <p class="mb-0">This customer has @Model.Orders.Count order history. Deleting the customer will also remove all order data.</p>
         </div>
     }
     
@@ -45,10 +45,10 @@
         @Html.AntiForgeryToken()
         <div class="d-flex gap-2">
             <button type="submit" class="btn btn-danger">
-                <i class="fas fa-trash me-1"></i>ยืนยันการลบ
+                <i class="fas fa-trash me-1"></i>Confirm Delete
             </button>
             <a asp-action="Index" class="btn btn-secondary">
-                <i class="fas fa-arrow-left me-1"></i>ยกเลิก
+                <i class="fas fa-arrow-left me-1"></i>Cancel
             </a>
         </div>
     </form>

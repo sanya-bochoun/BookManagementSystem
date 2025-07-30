@@ -87,15 +87,15 @@ namespace BookManagementSystem.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    // ตรวจสอบว่าฐานข้อมูลพร้อมใช้งานหรือไม่
+                    // Check if database is ready
                     if (!_context.Database.CanConnect())
                     {
-                        ModelState.AddModelError("", "ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
+                        ModelState.AddModelError("", "Cannot connect to database. Please try again.");
                         ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
                         return View(book);
                     }
 
-                    // ตรวจสอบว่าตาราง Books มีอยู่หรือไม่
+                    // Check if Books table exists
                     try
                     {
                         var booksExist = _context.Database.ExecuteSqlRaw("SELECT 1 FROM \"Books\" LIMIT 1");
@@ -103,12 +103,12 @@ namespace BookManagementSystem.Controllers
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Error checking Books table: {ex.Message}");
-                        ModelState.AddModelError("", "ฐานข้อมูลยังไม่พร้อมใช้งาน กรุณาลองใหม่อีกครั้ง");
+                        ModelState.AddModelError("", "Database is not ready. Please try again.");
                         ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
                         return View(book);
                     }
 
-                    // แปลง DateTime เป็น UTC
+                    // Convert DateTime to UTC
                     if (book.PublishedDate.Kind == DateTimeKind.Unspecified)
                     {
                         book.PublishedDate = DateTime.SpecifyKind(book.PublishedDate, DateTimeKind.Utc);
@@ -138,7 +138,7 @@ namespace BookManagementSystem.Controllers
                 Console.WriteLine($"Error in BooksController.Create: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 
-                ModelState.AddModelError("", "เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง");
+                ModelState.AddModelError("", "An error occurred while saving data. Please try again.");
             }
             
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");

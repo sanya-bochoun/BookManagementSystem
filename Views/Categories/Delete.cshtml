@@ -1,16 +1,16 @@
 @model BookManagementSystem.Models.Category
 @{
-    ViewData["Title"] = "ลบหมวดหมู่";
+    ViewData["Title"] = "Delete Category";
 }
 <h2>@ViewData["Title"]</h2>
-<h4>คุณต้องการลบหมวดหมู่นี้หรือไม่?</h4>
+<h4>Are you sure you want to delete this category?</h4>
 <div class="card mb-3">
     <div class="card-body">
         <dl class="row">
-            <dt class="col-sm-3">ชื่อหมวดหมู่</dt>
+            <dt class="col-sm-3">Category Name</dt>
             <dd class="col-sm-9">@Model.Name</dd>
         </dl>
-        <h5>รายการหนังสือในหมวดหมู่นี้</h5>
+        <h5>Books in this category</h5>
         @if (Model.Books != null && Model.Books.Any())
         {
             <ul>
@@ -22,12 +22,12 @@
         }
         else
         {
-            <p class="text-muted">ไม่มีหนังสือในหมวดหมู่นี้</p>
+            <p class="text-muted">No books in this category</p>
         }
         <form asp-action="Delete" method="post">
             <input type="hidden" asp-for="CategoryId" />
-            <button type="submit" class="btn btn-danger">ยืนยันลบ</button>
-            <a asp-action="Index" class="btn btn-secondary">ยกเลิก</a>
+            <button type="submit" class="btn btn-danger">Confirm Delete</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 </div> 

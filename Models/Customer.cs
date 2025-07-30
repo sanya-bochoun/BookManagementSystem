@@ -7,20 +7,20 @@ namespace BookManagementSystem.Models
         [Key]
         public int CustomerId { get; set; }
 
-        [Required(ErrorMessage = "กรุณากรอกชื่อลูกค้า")]
-        [StringLength(100, ErrorMessage = "ชื่อลูกค้าต้องไม่เกิน 100 ตัวอักษร")]
-        [Display(Name = "ชื่อลูกค้า")]
+        [Required(ErrorMessage = "Please enter customer name")]
+        [StringLength(100, ErrorMessage = "Customer name must not exceed 100 characters")]
+        [Display(Name = "Customer Name")]
         public string Name { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "กรุณากรอกอีเมล")]
-        [EmailAddress(ErrorMessage = "รูปแบบอีเมลไม่ถูกต้อง")]
-        [StringLength(100, ErrorMessage = "อีเมลต้องไม่เกิน 100 ตัวอักษร")]
-        [Display(Name = "อีเมล")]
+        [Required(ErrorMessage = "Please enter email")]
+        [EmailAddress(ErrorMessage = "Invalid email format")]
+        [StringLength(100, ErrorMessage = "Email must not exceed 100 characters")]
+        [Display(Name = "Email")]
         public string Email { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "กรุณากรอกเบอร์โทรศัพท์")]
-        [StringLength(20, ErrorMessage = "เบอร์โทรศัพท์ต้องไม่เกิน 20 ตัวอักษร")]
-        [Display(Name = "เบอร์โทรศัพท์")]
+        [Required(ErrorMessage = "Please enter phone number")]
+        [StringLength(20, ErrorMessage = "Phone number must not exceed 20 characters")]
+        [Display(Name = "Phone Number")]
         public string Phone { get; set; } = string.Empty;
 
         // Navigation property

@@ -1,35 +1,35 @@
 @model BookManagementSystem.Models.Customer
 @{
-    ViewData["Title"] = "แก้ไขข้อมูลลูกค้า";
+    ViewData["Title"] = "Edit Customer";
 }
 <div class="glass-card mt-4">
-    <h2 class="mb-4 text-white"><i class="fas fa-edit me-2"></i>แก้ไขข้อมูลลูกค้า</h2>
+    <h2 class="mb-4 text-white"><i class="fas fa-edit me-2"></i>Edit Customer</h2>
     <form asp-action="Edit" method="post">
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="CustomerId" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         
         <div class="mb-3">
-            <label asp-for="Name" class="form-label text-white"><i class="fas fa-user me-1"></i>ชื่อลูกค้า</label>
+            <label asp-for="Name" class="form-label text-white"><i class="fas fa-user me-1"></i>Customer Name</label>
             <input asp-for="Name" class="form-control" />
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
         
         <div class="mb-3">
-            <label asp-for="Email" class="form-label text-white"><i class="fas fa-envelope me-1"></i>อีเมล</label>
+            <label asp-for="Email" class="form-label text-white"><i class="fas fa-envelope me-1"></i>Email</label>
             <input asp-for="Email" class="form-control" type="email" />
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
         
         <div class="mb-3">
-            <label asp-for="Phone" class="form-label text-white"><i class="fas fa-phone me-1"></i>เบอร์โทรศัพท์</label>
+            <label asp-for="Phone" class="form-label text-white"><i class="fas fa-phone me-1"></i>Phone Number</label>
             <input asp-for="Phone" class="form-control" />
             <span asp-validation-for="Phone" class="text-danger"></span>
         </div>
         
         <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-modern"><i class="fas fa-save me-1"></i>บันทึก</button>
-            <a asp-action="Index" class="btn btn-secondary-modern"><i class="fas fa-arrow-left me-1"></i>กลับ</a>
+            <button type="submit" class="btn btn-modern"><i class="fas fa-save me-1"></i>Save</button>
+            <a asp-action="Index" class="btn btn-secondary-modern"><i class="fas fa-arrow-left me-1"></i>Back</a>
         </div>
     </form>
 </div>

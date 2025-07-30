@@ -1,16 +1,16 @@
 @model BookManagementSystem.Models.Book
 @{
-    ViewData["Title"] = "เพิ่มหนังสือใหม่";
+    ViewData["Title"] = "Add New Book";
 }
 <div class="glass-card mt-4">
-    <h2 class="mb-4 text-white"><i class="fas fa-plus me-2"></i>เพิ่มหนังสือใหม่</h2>
+    <h2 class="mb-4 text-white"><i class="fas fa-plus me-2"></i>Add New Book</h2>
     <form asp-action="Create" method="post" enctype="multipart/form-data">
         @Html.AntiForgeryToken()
         
         @if (!ViewData.ModelState.IsValid)
         {
             <div class="alert alert-danger">
-                <h5><i class="fas fa-exclamation-triangle me-2"></i>เกิดข้อผิดพลาด</h5>
+                <h5><i class="fas fa-exclamation-triangle me-2"></i>An error occurred</h5>
                 <div asp-validation-summary="All" class="text-danger"></div>
             </div>
         }
@@ -28,17 +28,17 @@
         }
         
         <div class="mb-3">
-            <label asp-for="Title" class="form-label text-white"><i class="fas fa-book me-1"></i>ชื่อหนังสือ</label>
+            <label asp-for="Title" class="form-label text-white"><i class="fas fa-book me-1"></i>Book Title</label>
             <input asp-for="Title" class="form-control" />
             <span asp-validation-for="Title" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="Author" class="form-label text-white"><i class="fas fa-user-edit me-1"></i>ผู้แต่ง</label>
+            <label asp-for="Author" class="form-label text-white"><i class="fas fa-user-edit me-1"></i>Author</label>
             <input asp-for="Author" class="form-control" />
             <span asp-validation-for="Author" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="PublishedDate" class="form-label text-white"><i class="fas fa-calendar-alt me-1"></i>วันที่ตีพิมพ์</label>
+            <label asp-for="PublishedDate" class="form-label text-white"><i class="fas fa-calendar-alt me-1"></i>Published Date</label>
             <input asp-for="PublishedDate" class="form-control" type="date" />
             <span asp-validation-for="PublishedDate" class="text-danger"></span>
         </div>
@@ -48,33 +48,33 @@
             <span asp-validation-for="ISBN" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="CategoryId" class="form-label text-white"><i class="fas fa-tags me-1"></i>หมวดหมู่</label>
+            <label asp-for="CategoryId" class="form-label text-white"><i class="fas fa-tags me-1"></i>Category</label>
             <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
-                <option value="">-- เลือกหมวดหมู่ --</option>
+                <option value="">-- Select Category --</option>
             </select>
             <span asp-validation-for="CategoryId" class="text-danger"></span>
         </div>
         
         <div class="mb-3">
-            <label asp-for="Price" class="form-label text-white"><i class="fas fa-money-bill me-1"></i>ราคา</label>
+            <label asp-for="Price" class="form-label text-white"><i class="fas fa-money-bill me-1"></i>Price</label>
             <input asp-for="Price" class="form-control" type="number" min="0.01" step="0.01" placeholder="0.00" />
             <span asp-validation-for="Price" class="text-danger"></span>
         </div>
         
         <div class="mb-3">
-            <label asp-for="Description" class="form-label text-white"><i class="fas fa-align-left me-1"></i>รายละเอียดหนังสือ</label>
-            <textarea asp-for="Description" class="form-control" rows="4" placeholder="อธิบายเนื้อหา สาระสำคัญ หรือรายละเอียดของหนังสือ..."></textarea>
-            <small class="text-muted">(ไม่เกิน 2000 ตัวอักษร)</small>
+            <label asp-for="Description" class="form-label text-white"><i class="fas fa-align-left me-1"></i>Book Description</label>
+            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Describe the content, key points, or details of the book..."></textarea>
+            <small class="text-muted">(Maximum 2000 characters)</small>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label for="coverImage" class="form-label text-white"><i class="fas fa-image me-1"></i>รูปปกหนังสือ</label>
+            <label for="coverImage" class="form-label text-white"><i class="fas fa-image me-1"></i>Book Cover Image</label>
             <input type="file" id="coverImage" name="coverImage" class="form-control" accept="image/*" />
-            <small class="text-white-50">รองรับไฟล์: JPG, PNG, GIF ขนาดไม่เกิน 5MB</small>
+            <small class="text-white-50">Supported files: JPG, PNG, GIF, maximum 5MB</small>
         </div>
         <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-modern"><i class="fas fa-save me-1"></i>บันทึก</button>
-            <a asp-action="Index" class="btn btn-secondary-modern"><i class="fas fa-arrow-left me-1"></i>กลับ</a>
+            <button type="submit" class="btn btn-modern"><i class="fas fa-save me-1"></i>Save</button>
+            <a asp-action="Index" class="btn btn-secondary-modern"><i class="fas fa-arrow-left me-1"></i>Back</a>
         </div>
     </form>
     @section Scripts {

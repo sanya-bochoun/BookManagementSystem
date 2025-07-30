@@ -5,10 +5,10 @@ using BookManagementSystem.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Register ApplicationDbContext
-// รองรับทั้ง SQL Server และ PostgreSQL
+// Support both SQL Server and PostgreSQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// Debug: แสดง Connection String (ซ่อน password)
+// Debug: Show Connection String (hide password)
 if (!string.IsNullOrEmpty(connectionString))
 {
     var debugConnectionString = connectionString.Replace("Mg9C6bfH0T8pkDcupTaEnocGm1siicrJ", "***");
@@ -29,16 +29,16 @@ if (string.IsNullOrEmpty(connectionString))
     throw new InvalidOperationException("Connection string 'DefaultConnection' not found. Please check your environment variables or configuration.");
 }
 
-// ลองแปลง Connection String เป็น semicolon format
+// Try to convert Connection String to semicolon format
 if (connectionString.StartsWith("postgresql://"))
 {
-    // แปลงจาก URL format เป็น semicolon format
+    // Convert from URL format to semicolon format
     var uri = new Uri(connectionString);
     var userInfo = uri.UserInfo.Split(':');
     var username = userInfo[0];
     var password = userInfo[1];
     
-    // ใช้ port 5432 ถ้าไม่มี port ใน URL
+    // Use port 5432 if no port in URL
     var port = uri.Port > 0 ? uri.Port : 5432;
     
     connectionString = $"Host={uri.Host};Port={port};Database={uri.AbsolutePath.TrimStart('/')};Username={username};Password={password}";
@@ -53,7 +53,7 @@ if (connectionString.Contains("Server=") || connectionString.Contains("Data Sour
 }
 else
 {
-    // PostgreSQL (สำหรับ Render)
+    // PostgreSQL (for Render)
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseNpgsql(connectionString));
 }
@@ -61,7 +61,7 @@ else
 // Register Cloudinary Service
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
-// เพิ่มบริการ MVC
+// Add MVC services
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -73,18 +73,18 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-// ใช้งาน static files (ถ้ามี wwwroot)
+// Use static files (if wwwroot exists)
 app.UseStaticFiles();
 
-// ใช้งาน routing
+// Use routing
 app.UseRouting();
 
-// ใช้งาน endpoints สำหรับ Controller + View
+// Use endpoints for Controller + View
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// สร้าง database และตารางอัตโนมัติ (ทำหลัง middleware setup)
+// Create database and tables automatically (after middleware setup)
 try
 {
     Console.WriteLine("Starting database creation...");
@@ -92,7 +92,7 @@ try
     {
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         
-        // ตรวจสอบว่า database มีอยู่หรือไม่
+        // Check if database exists
         var canConnect = context.Database.CanConnect();
         Console.WriteLine($"Database can connect: {canConnect}");
         
@@ -101,11 +101,11 @@ try
             Console.WriteLine("Cannot connect to database. Creating database...");
         }
         
-        // สร้าง database และตารางทั้งหมด
+        // Create database and all tables
         context.Database.EnsureCreated();
         Console.WriteLine("Database and tables created successfully!");
         
-        // ตรวจสอบว่าตาราง Books มีอยู่หรือไม่
+        // Check if Books table exists
         try
         {
             var booksExist = context.Database.ExecuteSqlRaw("SELECT 1 FROM \"Books\" LIMIT 1") >= 0;
@@ -116,12 +116,12 @@ try
             Console.WriteLine($"Error checking Books table: {ex.Message}");
         }
         
-        // เพิ่มข้อมูลตัวอย่างถ้าตารางว่าง
+        // Add sample data if table is empty
         if (!context.Books.Any())
         {
             Console.WriteLine("Adding sample data...");
             
-            // เพิ่ม Categories
+            // Add Categories
             var categories = new List<Category>
             {
                 new Category { Name = "Fiction" },
@@ -131,7 +131,7 @@ try
             context.Categories.AddRange(categories);
             context.SaveChanges();
             
-            // เพิ่ม Books
+            // Add Books
             var books = new List<Book>
             {
                 new Book { 

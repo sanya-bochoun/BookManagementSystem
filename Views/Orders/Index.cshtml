@@ -1,13 +1,13 @@
 @model IEnumerable<BookManagementSystem.Models.Order>
 @{
-    ViewData["Title"] = "รายการคำสั่งซื้อ";
+    ViewData["Title"] = "Order List";
 }
 <div class="glass-card mt-4">
-    <h2 class="mb-4 text-white"><i class="fas fa-shopping-cart me-2"></i>รายการคำสั่งซื้อ</h2>
+    <h2 class="mb-4 text-white"><i class="fas fa-shopping-cart me-2"></i>Order List</h2>
     
     <div class="mb-3">
         <a asp-action="Create" class="btn btn-modern">
-            <i class="fas fa-plus me-1"></i>สร้างคำสั่งซื้อใหม่
+            <i class="fas fa-plus me-1"></i>Create New Order
         </a>
     </div>
     
@@ -15,12 +15,12 @@
         <table class="table table-bordered table-striped bg-white rounded shadow-sm">
             <thead>
                 <tr>
-                    <th>รหัสคำสั่งซื้อ</th>
-                    <th>ลูกค้า</th>
-                    <th>วันที่สั่งซื้อ</th>
-                    <th>จำนวนรายการ</th>
-                    <th>ยอดรวม</th>
-                    <th style="width: 120px;">จัดการ</th>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Order Date</th>
+                    <th>Number of Items</th>
+                    <th>Total Amount</th>
+                    <th style="width: 120px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -30,17 +30,17 @@
                     <td>#@item.OrderId.ToString("D4")</td>
                     <td>@item.Customer?.Name</td>
                     <td>@item.OrderDate.ToString("dd/MM/yyyy")</td>
-                    <td>@item.OrderItems.Count รายการ</td>
-                    <td>@item.TotalAmount.ToString("N2") บาท</td>
+                    <td>@item.OrderItems.Count items</td>
+                    <td>@item.TotalAmount.ToString("N2") THB</td>
                     <td>
                         <div class="btn-group" role="group">
-                            <a asp-action="Details" asp-route-id="@item.OrderId" class="btn btn-info btn-sm" title="ดูรายละเอียด">
+                            <a asp-action="Details" asp-route-id="@item.OrderId" class="btn btn-info btn-sm" title="View Details">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a asp-action="Edit" asp-route-id="@item.OrderId" class="btn btn-warning btn-sm" title="แก้ไข">
+                            <a asp-action="Edit" asp-route-id="@item.OrderId" class="btn btn-warning btn-sm" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a asp-action="Delete" asp-route-id="@item.OrderId" class="btn btn-danger btn-sm" title="ลบ">
+                            <a asp-action="Delete" asp-route-id="@item.OrderId" class="btn btn-danger btn-sm" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
@@ -55,8 +55,8 @@
     {
         <div class="text-center py-5">
             <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
-            <h4 class="text-muted">ไม่พบคำสั่งซื้อ</h4>
-            <p class="text-muted">เริ่มต้นโดยการสร้างคำสั่งซื้อใหม่</p>
+            <h4 class="text-muted">No orders found</h4>
+            <p class="text-muted">Start by creating a new order</p>
         </div>
     }
 </div> 

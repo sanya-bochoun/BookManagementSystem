@@ -1,9 +1,9 @@
 @model BookManagementSystem.Models.Book
 @{
-    ViewData["Title"] = "รายละเอียดหนังสือ";
+    ViewData["Title"] = "Book Details";
 }
 <div class="glass-card mt-4">
-    <h2 class="mb-4 text-white"><i class="fas fa-info-circle me-2"></i>รายละเอียดหนังสือ</h2>
+    <h2 class="mb-4 text-white"><i class="fas fa-info-circle me-2"></i>Book Details</h2>
     
     <div class="row">
         <div class="col-md-4">
@@ -17,7 +17,7 @@
                     {
                         <div class="text-center py-5">
                             <i class="fas fa-book fa-5x text-muted"></i>
-                            <p class="text-muted mt-3">ไม่มีรูปปก</p>
+                            <p class="text-muted mt-3">No cover image</p>
                         </div>
                     }
                 </div>
@@ -28,28 +28,28 @@
                 <div class="card-body">
                     <h4 class="card-title text-primary mb-4">@Model.Title</h4>
                     <dl class="row">
-                        <dt class="col-sm-4"><i class="fas fa-user-edit me-2"></i>ผู้แต่ง</dt>
+                        <dt class="col-sm-4"><i class="fas fa-user-edit me-2"></i>Author</dt>
                         <dd class="col-sm-8">@Model.Author</dd>
                         
-                        <dt class="col-sm-4"><i class="fas fa-calendar-alt me-2"></i>วันที่ตีพิมพ์</dt>
+                        <dt class="col-sm-4"><i class="fas fa-calendar-alt me-2"></i>Published Date</dt>
                         <dd class="col-sm-8">@Model.PublishedDate.ToString("dd/MM/yyyy")</dd>
                         
                         <dt class="col-sm-4">ISBN:</dt>
                         <dd class="col-sm-8">@Model.ISBN</dd>
                         
-                        <dt class="col-sm-4">หมวดหมู่:</dt>
+                        <dt class="col-sm-4">Category:</dt>
                         <dd class="col-sm-8">@Model.Category?.Name</dd>
                         
-                        <dt class="col-sm-4">ราคา:</dt>
+                        <dt class="col-sm-4">Price:</dt>
                         <dd class="col-sm-8">
-                            <span class="badge bg-success fs-6">@Model.Price.ToString("N2") บาท</span>
+                            <span class="badge bg-success fs-6">@Model.Price.ToString("N2") THB</span>
                         </dd>
                     </dl>
                     
                     @if (!string.IsNullOrEmpty(Model.Description))
                     {
                         <div class="mt-4">
-                            <h5 class="text-primary"><i class="fas fa-align-left me-2"></i>รายละเอียดหนังสือ</h5>
+                            <h5 class="text-primary"><i class="fas fa-align-left me-2"></i>Book Description</h5>
                             <div class="card bg-light">
                                 <div class="card-body">
                                     <p class="card-text" style="white-space: pre-line;">@Model.Description</p>
@@ -60,10 +60,10 @@
                     
                     <div class="mt-4">
                         <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning me-2">
-                            <i class="fas fa-edit me-1"></i>แก้ไข
+                            <i class="fas fa-edit me-1"></i>Edit
                         </a>
                         <a asp-action="Index" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left me-1"></i>กลับ
+                            <i class="fas fa-arrow-left me-1"></i>Back
                         </a>
                     </div>
                 </div>
