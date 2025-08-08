@@ -46,6 +46,11 @@ namespace BookManagementSystem.Models
             modelBuilder.Entity<Book>()
                 .Property(b => b.PublishedDate)
                 .HasColumnType("timestamp with time zone");
+
+            // Set OrderDate for PostgreSQL
+            modelBuilder.Entity<Order>()
+                .Property(o => o.OrderDate)
+                .HasColumnType("timestamp with time zone");
         }
 
         public override int SaveChanges()

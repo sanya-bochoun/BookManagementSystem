@@ -98,7 +98,8 @@ namespace BookManagementSystem.Controllers
                     // Check if Books table exists
                     try
                     {
-                        var booksExist = _context.Database.ExecuteSqlRaw("SELECT TOP 1 1 FROM Books");
+                        // Use database-agnostic query
+                        var booksExist = _context.Books.Any();
                     }
                     catch (Exception ex)
                     {

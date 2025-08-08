@@ -64,6 +64,8 @@ builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 // Add MVC services
 builder.Services.AddControllersWithViews();
 
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
@@ -108,7 +110,7 @@ try
         // Check if Books table exists
         try
         {
-            var booksExist = context.Database.ExecuteSqlRaw("SELECT TOP 1 1 FROM Books") >= 0;
+            var booksExist = context.Books.Any();
             Console.WriteLine($"Books table exists: {booksExist}");
         }
         catch (Exception ex)

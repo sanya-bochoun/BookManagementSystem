@@ -95,6 +95,12 @@ namespace BookManagementSystem.Controllers
                         }
                     }
                     
+                    // Convert DateTime to UTC for PostgreSQL
+                    if (order.OrderDate.Kind == DateTimeKind.Unspecified)
+                    {
+                        order.OrderDate = DateTime.SpecifyKind(order.OrderDate, DateTimeKind.Utc);
+                    }
+                    
                     // Calculate total amount
                     order.TotalAmount = orderItems.Sum(oi => oi.SubTotal);
                     
