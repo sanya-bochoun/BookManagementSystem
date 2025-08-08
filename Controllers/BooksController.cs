@@ -30,7 +30,9 @@ namespace BookManagementSystem.Controllers
             // Apply search filter
             if (!string.IsNullOrEmpty(searchString))
             {
-                booksQuery = booksQuery.Where(b => b.Title.Contains(searchString) || b.Author.Contains(searchString));
+                var lowerSearchString = searchString.ToLower();
+                booksQuery = booksQuery.Where(b => b.Title.ToLower().Contains(lowerSearchString) ||
+                                                  b.Author.ToLower().Contains(lowerSearchString));
             }
 
             // Apply category filter
@@ -236,7 +238,6 @@ namespace BookManagementSystem.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // API endpoint to search books for AJAX
         // API endpoint to search books for AJAX
         [HttpGet]
         public async Task<IActionResult> Search(string searchString)
