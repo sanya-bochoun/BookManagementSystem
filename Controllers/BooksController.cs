@@ -26,30 +26,30 @@ namespace BookManagementSystem.Controllers
         public async Task<IActionResult> Index(string searchString, int? categoryId, int page = 1)
         {
             var booksQuery = _context.Books.Include(b => b.Category).AsQueryable();
-            
+
             // Apply search filter
             if (!string.IsNullOrEmpty(searchString))
             {
                 booksQuery = booksQuery.Where(b => b.Title.Contains(searchString) || b.Author.Contains(searchString));
             }
-            
+
             // Apply category filter
             if (categoryId.HasValue)
             {
                 booksQuery = booksQuery.Where(b => b.CategoryId == categoryId.Value);
             }
-            
+
             // Pagination
             int pageSize = 8;
             int totalBooks = await booksQuery.CountAsync();
             int totalPages = (int)Math.Ceiling((double)totalBooks / pageSize);
-            
+
             var books = await booksQuery
                 .OrderByDescending(b => b.PublishedDate)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-            
+
             // Prepare view data
             ViewBag.SearchString = searchString;
             ViewBag.CategoryId = categoryId;
@@ -57,7 +57,7 @@ namespace BookManagementSystem.Controllers
             ViewBag.TotalPages = totalPages;
             ViewBag.TotalBooks = totalBooks;
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
-            
+
             return View(books);
         }
 
@@ -138,10 +138,10 @@ namespace BookManagementSystem.Controllers
             {
                 Console.WriteLine($"Error in BooksController.Create: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                
+
                 ModelState.AddModelError("", "An error occurred while saving data. Please try again.");
             }
-            
+
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
             return View(book);
         }
@@ -150,10 +150,10 @@ namespace BookManagementSystem.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-            
+
             var book = await _context.Books.FindAsync(id);
             if (book == null) return NotFound();
-            
+
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
             return View(book);
         }
@@ -164,7 +164,7 @@ namespace BookManagementSystem.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("BookId,Title,Author,PublishedDate,ISBN,CategoryId,Price,CoverImageUrl,Description")] Book book, IFormFile? coverImage)
         {
             if (id != book.BookId) return NotFound();
-            
+
             if (ModelState.IsValid)
             {
                 try
@@ -181,7 +181,7 @@ namespace BookManagementSystem.Controllers
                                 await _cloudinaryService.DeleteImageAsync(publicId);
                             }
                         }
-                        
+
                         // Upload new image
                         book.CoverImageUrl = await _cloudinaryService.UploadImageAsync(coverImage);
                     }
@@ -237,17 +237,21 @@ namespace BookManagementSystem.Controllers
         }
 
         // API endpoint to search books for AJAX
+        // API endpoint to search books for AJAX
         [HttpGet]
         public async Task<IActionResult> Search(string searchString)
         {
-            if (string.IsNullOrEmpty(searchString))
+            if (string.IsNullOrWhiteSpace(searchString))
                 return Json(new List<object>());
 
+            var lowerSearchString = searchString.ToLower();
             var books = await _context.Books
-                .Where(b => b.Title.Contains(searchString) || b.Author.Contains(searchString))
-                .Select(b => new { 
-                    title = b.Title, 
-                    author = b.Author, 
+                .Where(b => b.Title.ToLower().Contains(lowerSearchString) ||
+                           b.Author.ToLower().Contains(lowerSearchString))
+                .Select(b => new
+                {
+                    title = b.Title,
+                    author = b.Author,
                     price = b.Price,
                     isbn = b.ISBN
                 })
