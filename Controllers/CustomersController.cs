@@ -26,6 +26,7 @@ namespace BookManagementSystem.Controllers
             
             var customer = await _context.Customers
                 .Include(c => c.Orders)
+                    .ThenInclude(o => o.OrderItems)
                 .FirstOrDefaultAsync(m => m.CustomerId == id);
                 
             if (customer == null) return NotFound();

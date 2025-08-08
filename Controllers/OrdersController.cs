@@ -36,6 +36,17 @@ namespace BookManagementSystem.Controllers
                 
             if (order == null) return NotFound();
             
+            // Debug logging
+            Console.WriteLine($"Order ID: {order.OrderId}");
+            Console.WriteLine($"OrderItems Count: {order.OrderItems?.Count ?? 0}");
+            if (order.OrderItems != null)
+            {
+                foreach (var item in order.OrderItems)
+                {
+                    Console.WriteLine($"OrderItem: {item.ProductName}, Quantity: {item.Quantity}, UnitPrice: {item.UnitPrice}");
+                }
+            }
+            
             return View(order);
         }
 

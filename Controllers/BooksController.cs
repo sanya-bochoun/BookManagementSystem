@@ -98,7 +98,7 @@ namespace BookManagementSystem.Controllers
                     // Check if Books table exists
                     try
                     {
-                        var booksExist = _context.Database.ExecuteSqlRaw("SELECT 1 FROM \"Books\" LIMIT 1");
+                        var booksExist = _context.Database.ExecuteSqlRaw("SELECT TOP 1 1 FROM Books");
                     }
                     catch (Exception ex)
                     {
@@ -233,6 +233,27 @@ namespace BookManagementSystem.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        // API endpoint to search books for AJAX
+        [HttpGet]
+        public async Task<IActionResult> Search(string searchString)
+        {
+            if (string.IsNullOrEmpty(searchString))
+                return Json(new List<object>());
+
+            var books = await _context.Books
+                .Where(b => b.Title.Contains(searchString) || b.Author.Contains(searchString))
+                .Select(b => new { 
+                    title = b.Title, 
+                    author = b.Author, 
+                    price = b.Price,
+                    isbn = b.ISBN
+                })
+                .Take(10)
+                .ToListAsync();
+
+            return Json(books);
         }
 
         private string? ExtractPublicIdFromUrl(string url)

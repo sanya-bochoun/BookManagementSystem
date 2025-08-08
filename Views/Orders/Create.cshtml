@@ -84,6 +84,15 @@
                 </button>
             </div>
             <div class="card-body">
+                <!-- Search Book Section -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Search Book</label>
+                        <input type="text" class="form-control book-search" id="global-book-search" placeholder="Search book title or author..." onkeyup="searchBooksGlobal()">
+                        <div class="book-search-results" id="global-search-results" style="display: none; position: absolute; z-index: 1000; background: white; border: 1px solid #ddd; max-height: 200px; overflow-y: auto; width: 100%;"></div>
+                    </div>
+                </div>
+                
                 <div id="orderItemsContainer">
                     <!-- Order items will be added here dynamically -->
                 </div>
@@ -116,7 +125,7 @@ function addOrderItem() {
     itemDiv.innerHTML = `
         <div class="col-md-4">
             <label class="form-label">Product Name</label>
-            <input type="text" class="form-control product-name" placeholder="Product name" required>
+            <input type="text" class="form-control product-name" placeholder="Product name" required readonly>
         </div>
         <div class="col-md-2">
             <label class="form-label">Quantity</label>
@@ -124,7 +133,7 @@ function addOrderItem() {
         </div>
         <div class="col-md-2">
             <label class="form-label">Unit Price</label>
-            <input type="number" class="form-control unit-price" min="0.01" step="0.01" value="0.00" required onchange="calculateSubTotal(${itemCounter})">
+            <input type="number" class="form-control unit-price" min="0.01" step="0.01" value="0.00" required onchange="calculateSubTotal(${itemCounter})" readonly>
         </div>
         <div class="col-md-2">
             <label class="form-label">Sub Total</label>
@@ -173,6 +182,138 @@ function updateSummary() {
     document.getElementById('itemCount').textContent = items.length;
     document.getElementById('totalAmount').textContent = totalAmount.toFixed(2) + ' THB';
 }
+
+function searchBooksGlobal() {
+    const searchInput = document.getElementById('global-book-search');
+    const searchTerm = searchInput.value.trim();
+    const resultsDiv = document.getElementById('global-search-results');
+    
+    if (searchTerm.length < 2) {
+        resultsDiv.style.display = 'none';
+        return;
+    }
+    
+    // Call API to search books
+    fetch(`/Books/Search?searchString=${encodeURIComponent(searchTerm)}`)
+        .then(response => response.json())
+        .then(books => {
+            resultsDiv.innerHTML = '';
+            
+            if (books.length > 0) {
+                books.forEach(book => {
+                    const bookDiv = document.createElement('div');
+                    bookDiv.className = 'p-2 border-bottom book-result';
+                    bookDiv.style.cursor = 'pointer';
+                    bookDiv.innerHTML = `
+                        <div><strong>${book.title}</strong></div>
+                        <div class="text-muted">${book.author} - ${book.price} THB</div>
+                    `;
+                    bookDiv.onclick = () => selectBookGlobal(book);
+                    resultsDiv.appendChild(bookDiv);
+                });
+                resultsDiv.style.display = 'block';
+            } else {
+                resultsDiv.innerHTML = '<div class="p-2 text-muted">No books found</div>';
+                resultsDiv.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error searching books:', error);
+            resultsDiv.innerHTML = '<div class="p-2 text-danger">Error searching books</div>';
+            resultsDiv.style.display = 'block';
+        });
+}
+
+function selectBookGlobal(book) {
+    // Add a new order item with the selected book
+    addOrderItem();
+    
+    // Get the last added item
+    const lastItemId = itemCounter - 1;
+    const itemDiv = document.getElementById(`item-${lastItemId}`);
+    const productNameInput = itemDiv.querySelector('.product-name');
+    const unitPriceInput = itemDiv.querySelector('.unit-price');
+    
+    // Set the selected book data
+    productNameInput.value = book.title;
+    unitPriceInput.value = book.price;
+    
+    // Clear the global search
+    document.getElementById('global-book-search').value = '';
+    document.getElementById('global-search-results').style.display = 'none';
+    
+    // Calculate subtotal
+    calculateSubTotal(lastItemId);
+}
+
+function searchBooks(itemId) {
+    const searchInput = document.querySelector(`#item-${itemId} .book-search`);
+    const searchTerm = searchInput.value.trim();
+    const resultsDiv = document.getElementById(`search-results-${itemId}`);
+    
+    if (searchTerm.length < 2) {
+        resultsDiv.style.display = 'none';
+        return;
+    }
+    
+    // Call API to search books
+    fetch(`/Books/Search?searchString=${encodeURIComponent(searchTerm)}`)
+        .then(response => response.json())
+        .then(books => {
+            resultsDiv.innerHTML = '';
+            
+            if (books.length > 0) {
+                books.forEach(book => {
+                    const bookDiv = document.createElement('div');
+                    bookDiv.className = 'p-2 border-bottom book-result';
+                    bookDiv.style.cursor = 'pointer';
+                    bookDiv.innerHTML = `
+                        <div><strong>${book.title}</strong></div>
+                        <div class="text-muted">${book.author} - ${book.price} THB</div>
+                    `;
+                    bookDiv.onclick = () => selectBook(itemId, book);
+                    resultsDiv.appendChild(bookDiv);
+                });
+                resultsDiv.style.display = 'block';
+            } else {
+                resultsDiv.innerHTML = '<div class="p-2 text-muted">No books found</div>';
+                resultsDiv.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error searching books:', error);
+            resultsDiv.innerHTML = '<div class="p-2 text-danger">Error searching books</div>';
+            resultsDiv.style.display = 'block';
+        });
+}
+
+function selectBook(itemId, book) {
+    const itemDiv = document.getElementById(`item-${itemId}`);
+    const productNameInput = itemDiv.querySelector('.product-name');
+    const unitPriceInput = itemDiv.querySelector('.unit-price');
+    const searchInput = itemDiv.querySelector('.book-search');
+    const resultsDiv = document.getElementById(`search-results-${itemId}`);
+    
+    // Set the selected book data
+    productNameInput.value = book.title;
+    unitPriceInput.value = book.price;
+    searchInput.value = book.title;
+    
+    // Hide search results
+    resultsDiv.style.display = 'none';
+    
+    // Calculate subtotal
+    calculateSubTotal(itemId);
+}
+
+// Hide search results when clicking outside
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.book-search') && !e.target.closest('.book-search-results')) {
+        document.querySelectorAll('.book-search-results').forEach(div => {
+            div.style.display = 'none';
+        });
+    }
+});
 
 function prepareOrderItems() {
     const items = [];

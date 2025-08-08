@@ -108,7 +108,7 @@ try
         // Check if Books table exists
         try
         {
-            var booksExist = context.Database.ExecuteSqlRaw("SELECT 1 FROM \"Books\" LIMIT 1") >= 0;
+            var booksExist = context.Database.ExecuteSqlRaw("SELECT TOP 1 1 FROM Books") >= 0;
             Console.WriteLine($"Books table exists: {booksExist}");
         }
         catch (Exception ex)

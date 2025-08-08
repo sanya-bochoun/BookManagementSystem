@@ -71,7 +71,7 @@
                                 <tr>
                                     <td>#@order.OrderId.ToString("D4")</td>
                                     <td>@order.OrderDate.ToString("dd/MM/yyyy")</td>
-                                    <td>@order.OrderItems.Count items</td>
+                                    <td>@(order.OrderItems?.Count ?? 0) items</td>
                                     <td>@order.TotalAmount.ToString("N2") THB</td>
                                     <td>
                                         <a href="/Orders/Details/@order.OrderId" class="btn btn-info btn-sm" title="View Details">
