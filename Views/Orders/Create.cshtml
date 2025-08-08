@@ -141,9 +141,11 @@ function addOrderItem() {
         </div>
         <div class="col-md-2">
             <label class="form-label">&nbsp;</label>
-            <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeOrderItem(${itemCounter})">
-                <i class="fas fa-trash"></i>
-            </button>
+            <div class="d-grid">
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeOrderItem(${itemCounter})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
         </div>
     `;
     
@@ -225,16 +227,35 @@ function searchBooksGlobal() {
 }
 
 function selectBookGlobal(book) {
-    // Add a new order item with the selected book
-    addOrderItem();
+    // Find existing empty items first
+    const orderItems = document.querySelectorAll('.order-item');
+    let targetItem = null;
+    let targetItemId = null;
     
-    // Get the last added item
-    const lastItemId = itemCounter - 1;
-    const itemDiv = document.getElementById(`item-${lastItemId}`);
-    const productNameInput = itemDiv.querySelector('.product-name');
-    const unitPriceInput = itemDiv.querySelector('.unit-price');
+    // Check if there's an empty item we can use
+    for (let i = 0; i < orderItems.length; i++) {
+        const item = orderItems[i];
+        const productName = item.querySelector('.product-name').value;
+        const unitPrice = parseFloat(item.querySelector('.unit-price').value) || 0;
+        
+        if (!productName || productName.trim() === '' || unitPrice === 0) {
+            targetItem = item;
+            targetItemId = parseInt(item.id.split('-')[1]);
+            break;
+        }
+    }
+    
+    // If no empty item found, create new one
+    if (!targetItem) {
+        addOrderItem();
+        targetItemId = itemCounter - 1;
+        targetItem = document.getElementById(`item-${targetItemId}`);
+    }
     
     // Set the selected book data
+    const productNameInput = targetItem.querySelector('.product-name');
+    const unitPriceInput = targetItem.querySelector('.unit-price');
+    
     productNameInput.value = book.title;
     unitPriceInput.value = book.price;
     
@@ -243,7 +264,7 @@ function selectBookGlobal(book) {
     document.getElementById('global-search-results').style.display = 'none';
     
     // Calculate subtotal
-    calculateSubTotal(lastItemId);
+    calculateSubTotal(targetItemId);
 }
 
 function searchBooks(itemId) {
