@@ -36,16 +36,7 @@ namespace BookManagementSystem.Controllers
                 
             if (order == null) return NotFound();
             
-            // Debug logging
-            Console.WriteLine($"Order ID: {order.OrderId}");
-            Console.WriteLine($"OrderItems Count: {order.OrderItems?.Count ?? 0}");
-            if (order.OrderItems != null)
-            {
-                foreach (var item in order.OrderItems)
-                {
-                    Console.WriteLine($"OrderItem: {item.ProductName}, Quantity: {item.Quantity}, UnitPrice: {item.UnitPrice}");
-                }
-            }
+
             
             return View(order);
         }
@@ -64,10 +55,7 @@ namespace BookManagementSystem.Controllers
         {
             try
             {
-                // Debug logging
-                Console.WriteLine($"CustomerId: {order.CustomerId}");
-                Console.WriteLine($"OrderDate: {order.OrderDate}");
-                Console.WriteLine($"OrderItemsJson: {orderItemsJson}");
+
                 
                 // Manual validation for CustomerId
                 if (order.CustomerId <= 0)
@@ -86,9 +74,8 @@ namespace BookManagementSystem.Controllers
                         {
                             orderItems = JsonSerializer.Deserialize<List<OrderItem>>(orderItemsJson) ?? new List<OrderItem>();
                         }
-                        catch (JsonException ex)
+                        catch (JsonException)
                         {
-                            Console.WriteLine($"JSON Deserialize Error: {ex.Message}");
                             ModelState.AddModelError("", "ข้อมูลรายการสินค้าไม่ถูกต้อง");
                             ViewBag.Customers = await _context.Customers.ToListAsync();
                             return View(order);
@@ -104,8 +91,7 @@ namespace BookManagementSystem.Controllers
                     // Calculate total amount
                     order.TotalAmount = orderItems.Sum(oi => oi.SubTotal);
                     
-                    Console.WriteLine($"TotalAmount: {order.TotalAmount}");
-                    Console.WriteLine($"OrderItems Count: {orderItems.Count}");
+
                     
                     _context.Add(order);
                     await _context.SaveChangesAsync();
@@ -125,17 +111,11 @@ namespace BookManagementSystem.Controllers
                 }
                 else
                 {
-                    Console.WriteLine("ModelState is not valid:");
-                    foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                    {
-                        Console.WriteLine($"Error: {error.ErrorMessage}");
-                    }
+                    // ModelState validation errors
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception: {ex.Message}");
-                Console.WriteLine($"StackTrace: {ex.StackTrace}");
                 ModelState.AddModelError("", "เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + ex.Message);
             }
             

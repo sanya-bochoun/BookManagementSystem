@@ -103,9 +103,8 @@ namespace BookManagementSystem.Controllers
                         // Use database-agnostic query
                         var booksExist = _context.Books.Any();
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        Console.WriteLine($"Error checking Books table: {ex.Message}");
                         ModelState.AddModelError("", "Database is not ready. Please try again.");
                         ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
                         return View(book);
@@ -123,9 +122,8 @@ namespace BookManagementSystem.Controllers
                         {
                             book.CoverImageUrl = await _cloudinaryService.UploadImageAsync(coverImage);
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
-                            Console.WriteLine($"Error uploading image: {ex.Message}");
                             // Continue without image upload
                             book.CoverImageUrl = "";
                         }
@@ -136,11 +134,8 @@ namespace BookManagementSystem.Controllers
                     return RedirectToAction(nameof(Index));
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error in BooksController.Create: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-
                 ModelState.AddModelError("", "An error occurred while saving data. Please try again.");
             }
 
@@ -287,3 +282,6 @@ namespace BookManagementSystem.Controllers
         }
     }
 }
+// [MermaidChart: d896b72b-e00a-4d93-9199-7e133dbfb0cc]
+// [MermaidChart: d896b72b-e00a-4d93-9199-7e133dbfb0cc]
+// [MermaidChart: d896b72b-e00a-4d93-9199-7e133dbfb0cc]

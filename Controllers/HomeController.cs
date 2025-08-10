@@ -53,11 +53,8 @@ namespace BookManagementSystem.Controllers
 
                 return View(dashboardData);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // Log the exception
-                Console.WriteLine($"Error in HomeController.Index: {ex.Message}");
-                
                 // Return empty dashboard if database is not ready
                 return View(new DashboardViewModel
                 {
