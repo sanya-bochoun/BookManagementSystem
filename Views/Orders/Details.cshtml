@@ -80,13 +80,16 @@
                             @for (int i = 0; i < (Model.OrderItems?.Count ?? 0); i++)
                             {
                                 var item = Model.OrderItems?.ElementAt(i);
-                                <tr>
-                                    <td>@(i + 1)</td>
-                                    <td>@item.ProductName</td>
-                                    <td>@item.Quantity</td>
-                                    <td>@item.UnitPrice.ToString("N2") THB</td>
-                                    <td>@item.SubTotal.ToString("N2") THB</td>
-                                </tr>
+                                @if (item != null)
+                                {
+                                    <tr>
+                                        <td>@(i + 1)</td>
+                                        <td>@item.ProductName</td>
+                                        <td>@item.Quantity</td>
+                                        <td>@item.UnitPrice.ToString("N2") THB</td>
+                                        <td>@item.SubTotal.ToString("N2") THB</td>
+                                    </tr>
+                                }
                             }
                         </tbody>
                         <tfoot>

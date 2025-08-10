@@ -1,0 +1,10 @@
+[33m4b8025f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Merge branch 'main' of https://github.com/sanya-bochoun/BookManagementSystem
+[33m17133ea[m Added .dockerignore files, Dockerfile, and build scripts for deploying Book Management System applications, as well as improvements to README.md to provide clearer and more comprehensive information about system features and settings.
+[33m38607f3[m Delete คู่มือ-สำหรับมือใหม่.md
+[33mbb09cb8[m Removed unnecessary files from the project, including .dockerignore, CONTRIBUTING.md, Dockerfile, LICENSE, and other settings files to clean up the project structure and reduce clutter. Also added settings in appsettings.json to support setting maximum file sizes and allowed file types.
+[33maebdd17[m Improved the book search functionality in BooksController using ToLower() to make searches more accurate, and removed unnecessary comments from the AJAX book search API endpoint.
+[33m2b61398[m Improved the book search functionality in BooksController by changing the search string validation to use ToLower() for more accurate searches, and improving error handling in the Create function for clearer display.
+[33mcfc72b7[m Improved the selectBookGlobal function in Create.cshtml to find empty order lines before adding new ones, and improved the subtotal calculation to be correct based on the selected line.
+[33mdd320cb[m Improved category sorting in CategoriesController by adding sorting by name before displaying on the Index page.
+[33m508a452[m Fix PostgreSQL compatibility issues: DateTime UTC conversion, SQL syntax, and null reference warnings
+[33mde3a321[m Improved the existence check of the Books table in the BooksController by changing the SQL statement to SELECT TOP 1 1 FROM Books and adding an API endpoint for searching for books in AJAX with improved display on the Create Order and Details pages of Orders and Customers, including improvements to displaying the correct number of items in Order and Customer Details.

@@ -60,7 +60,7 @@ namespace BookManagementSystem.Controllers
                 // Manual validation for CustomerId
                 if (order.CustomerId <= 0)
                 {
-                    ModelState.AddModelError("CustomerId", "กรุณาเลือกลูกค้า");
+                    ModelState.AddModelError("CustomerId", "Please select a customer");
                 }
                 
                 if (ModelState.IsValid)
@@ -76,7 +76,7 @@ namespace BookManagementSystem.Controllers
                         }
                         catch (JsonException)
                         {
-                            ModelState.AddModelError("", "ข้อมูลรายการสินค้าไม่ถูกต้อง");
+                            ModelState.AddModelError("", "Invalid order items data");
                             ViewBag.Customers = await _context.Customers.ToListAsync();
                             return View(order);
                         }
@@ -114,9 +114,9 @@ namespace BookManagementSystem.Controllers
                     // ModelState validation errors
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                ModelState.AddModelError("", "เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + ex.Message);
+                ModelState.AddModelError("", "An error occurred while saving the data. Please try again.");
             }
             
             ViewBag.Customers = await _context.Customers.ToListAsync();
